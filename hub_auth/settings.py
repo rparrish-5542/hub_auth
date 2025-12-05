@@ -146,7 +146,7 @@ CORS_ALLOW_HEADERS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "https://localhost:8001",
-    "https://employee.wedgwood.org",
+    "https://auth.wedgwood.org",
 ]
 
 # Default primary key field type
