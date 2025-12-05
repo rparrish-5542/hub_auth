@@ -27,3 +27,11 @@ else:
 " || true
 
 exec "$@"
+
+# Start Nginx in the background
+echo "Starting Nginx..."
+nginx -g "daemon on;" &
+
+# Start Gunicorn (exec replaces the shell process)
+echo "Starting Gunicorn..."
+exec "$@"
