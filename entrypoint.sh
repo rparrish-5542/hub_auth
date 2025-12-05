@@ -26,11 +26,11 @@ else:
     print('Superuser already exists');
 " || true
 
-exec "$@"
 
-# Start Nginx in the background
-echo "Starting Nginx..."
-nginx -g "daemon on;" &
+# Start Nginx in the Foreground
+echo "Starting NGINX in foreground..."
+nginx -g "daemon off;" &
+NGINX_PID=$!
 
 # Start Gunicorn (exec replaces the shell process)
 echo "Starting Gunicorn..."
