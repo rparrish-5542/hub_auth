@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: hub_auth_db_prod
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-hub_auth_db}
+      POSTGRES_USER: ${DATABASE_USER:-myadmin}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-secret123}
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    networks:
+      - hub_auth_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-myadmin} -d ${DATABASE_NAME:-hub_auth_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Hub Auth Service
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: hub_auth_service_prod
+    volumes:
+      - static_volume_prod:/app/staticfiles
+      - logs_volume_prod:/app/logs
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - hub_auth_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/admin/login/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: hub_auth_nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - static_volume_prod:/app/staticfiles:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+    networks:
+      - hub_auth_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data_prod:
+  static_volume_prod:
+  logs_volume_prod:
+
+networks:
+  hub_auth_network:
+    driver: bridge

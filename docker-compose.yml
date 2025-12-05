@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: hub_auth_db
+    environment:
+      POSTGRES_DB: hub_auth_db
+      POSTGRES_USER: myadmin
+      POSTGRES_PASSWORD: secret123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myadmin -d hub_auth_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hub_auth_network
+
+  # Hub Auth Service
+  web:
+    build: .
+    container_name: hub_auth_service
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - logs_volume:/app/logs
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-hub-auth-development-key-change-in-production
+      - DATABASE_NAME=hub_auth_db
+      - DATABASE_USER=myadmin
+      - DATABASE_PASSWORD=secret123
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - AZURE_AD_TENANT_ID=${AZURE_AD_TENANT_ID:-your-tenant-id-here}
+      - AZURE_AD_CLIENT_ID=${AZURE_AD_CLIENT_ID:-your-client-id-here}
+      - AZURE_AD_CLIENT_SECRET=${AZURE_AD_CLIENT_SECRET:-your-client-secret-here}
+      - ALLOWED_HOSTS=localhost,127.0.0.1,hub_auth_service
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - hub_auth_network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/admin/login/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  postgres_data:
+  static_volume:
+  logs_volume:
+
+networks:
+  hub_auth_network:
+    driver: bridge

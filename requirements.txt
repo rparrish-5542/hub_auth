@@ -1,0 +1,25 @@
+# Hub Auth Service - Requirements
+
+# Django and Core Dependencies
+Django>=5.2.8
+psycopg2-binary>=2.9.9
+
+# Django REST Framework
+djangorestframework>=3.14.0
+django-cors-headers>=4.3.1
+django-filter>=23.5
+
+# JWT and Azure AD
+PyJWT>=2.8.0
+cryptography>=41.0.7
+requests>=2.31.0
+
+# Environment Variables
+python-dotenv>=1.0.0
+
+# Production Server
+gunicorn>=21.2.0
+
+# Development/Testing
+pytest>=7.4.3
+pytest-django>=4.7.0
