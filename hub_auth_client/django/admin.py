@@ -26,7 +26,7 @@ except ImportError:
 class ScopeDefinitionAdmin(admin.ModelAdmin):
     """Admin for managing scope definitions."""
     
-    list_display = ['name', 'category', 'is_active_badge', 'endpoint_count', 'updated_at']
+    list_display = ['name', 'category', 'is_active', 'is_active_badge', 'endpoint_count', 'updated_at']
     list_filter = ['is_active', 'category', 'created_at']
     search_fields = ['name', 'description', 'category']
     list_editable = ['is_active']
@@ -63,7 +63,7 @@ class ScopeDefinitionAdmin(admin.ModelAdmin):
 class RoleDefinitionAdmin(admin.ModelAdmin):
     """Admin for managing role definitions."""
     
-    list_display = ['name', 'is_active_badge', 'endpoint_count', 'updated_at']
+    list_display = ['name', 'is_active', 'is_active_badge', 'endpoint_count', 'updated_at']
     list_filter = ['is_active', 'created_at']
     search_fields = ['name', 'description']
     list_editable = ['is_active']
@@ -122,6 +122,7 @@ class EndpointPermissionAdmin(admin.ModelAdmin):
         'http_methods',
         'scope_count',
         'role_count',
+        'is_active',
         'is_active_badge',
         'priority'
     ]
@@ -204,6 +205,7 @@ if RLS_AVAILABLE:
             'policy_type',
             'scope_count',
             'role_count',
+            'is_active',
             'is_active_badge',
         ]
         list_filter = [
@@ -533,6 +535,7 @@ if RLS_AVAILABLE:
         
         list_display = [
             'table_name',
+            'rls_enabled',
             'rls_status_badge',
             'force_rls',
             'policy_count',
