@@ -1,0 +1,9 @@
+# Core dependencies for hub-auth-client
+PyJWT>=2.8.0
+cryptography>=41.0.0
+requests>=2.31.0
+
+# Optional: Django support
+# Uncomment if you need Django integration
+# Django>=4.2
+# djangorestframework>=3.14.0

@@ -46,6 +46,7 @@ class User(AbstractUser):
     class Meta:
         verbose_name = "User"
         verbose_name_plural = "Users"
+        db_table = 'authentication_user'
         indexes = [
             models.Index(fields=['azure_ad_object_id', 'is_active']),
             models.Index(fields=['employee_id']),
@@ -82,6 +83,7 @@ class TokenValidation(models.Model):
     class Meta:
         verbose_name = "Token Validation"
         verbose_name_plural = "Token Validations"
+        db_table = 'authentication_tokenvalidation'
         ordering = ['-validation_timestamp']
         indexes = [
             models.Index(fields=['service_name', 'validation_timestamp']),
@@ -124,6 +126,7 @@ class ServiceClient(models.Model):
     class Meta:
         verbose_name = "Service Client"
         verbose_name_plural = "Service Clients"
+        db_table = 'authentication_serviceclient'
         ordering = ['name']
     
     def __str__(self):

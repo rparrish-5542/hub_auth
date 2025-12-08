@@ -1,69 +1,156 @@
-# Hub Auth - Centralized Authentication Service
+# Hub Auth - MSAL JWT Authentication Package
 
-Hub Auth is a centralized authentication service that validates JWT tokens from Microsoft Azure AD (MSAL) for all your backend services. It provides a single source of truth for authentication across your microservices architecture.
+This repository contains:
+1. **hub-auth-client** - A pip-installable Python package for MSAL JWT validation with Entra ID RBAC
+2. **hub_auth** - The original Django authentication service (optional)
 
-## Features
+## 📦 Hub Auth Client Package (Recommended)
 
-- **JWT Token Validation**: Validates MSAL tokens from Azure AD using public key verification
-- **User Synchronization**: Automatically syncs Azure AD users to local database
-- **Service Client Management**: API key-based authentication for backend services
-- **Comprehensive Logging**: Tracks all validation requests with detailed metrics
-- **REST API**: Simple HTTP API for token validation
-- **Reusable Client Library**: Easy integration with other Django projects
-- **Django Admin**: Full admin interface for managing users, service clients, and logs
+A reusable Python package for validating MSAL JWT tokens with Microsoft Entra ID (Azure AD) and implementing scope/role-based RBAC.
 
-## Architecture
+### Key Features
 
-```
-React/Postman (MSAL Token) 
-    ↓
-Backend Service (employee_manage, etc.)
-    ↓
-Hub Auth Service (validates token)
-    ↓
-Azure AD (verifies signature with public keys)
-```
+- ✅ **MSAL JWT Validation** - Validates tokens using Azure AD public keys
+- ✅ **Scope-Based RBAC** - Validate Entra ID scopes (delegated permissions)
+- ✅ **Role-Based RBAC** - Validate app roles
+- ✅ **Database-Driven Permissions** - Configure scopes/roles through Django admin
+- ✅ **Database-Driven Configuration** - Store Azure AD credentials in database (NEW!)
+- ✅ **PostgreSQL RLS Integration** - Database-level row security
+- ✅ **Django Integration** - Middleware, authentication backends, permissions
+- ✅ **Pip Installable** - Easy installation in any project
+- ✅ **Flexible** - Works standalone or with Django
 
-## Quick Start
-
-### 1. Install Dependencies
+### Quick Start
 
 ```bash
-pip install -r requirements.txt
+# Build the package
+cd c:\Users\rparrish\GitHub\micro_service\hub_auth
+.\build_and_install.ps1
+
+# Install in your project
+cd /path/to/your/project
+pip install c:\Users\rparrish\GitHub\micro_service\hub_auth
 ```
 
-### 2. Configure Azure AD
+### Documentation
 
-1. Register an application in Azure AD
-2. Note the **Tenant ID**, **Client ID**, and **Client Secret**
-3. Configure API permissions (optional, only needed if calling Graph API)
+**Start here:** [START_HERE.md](START_HERE.md) - Documentation index
 
-### 3. Update Settings
+**Key Guides:**
+- [QUICKSTART.md](QUICKSTART.md) - Get started in 5 minutes
+- [README_PACKAGE.md](README_PACKAGE.md) - Complete package documentation
+- [DYNAMIC_PERMISSIONS.md](DYNAMIC_PERMISSIONS.md) - Database-driven permissions
+- [DATABASE_CONFIG_GUIDE.md](DATABASE_CONFIG_GUIDE.md) - Database-driven configuration (NEW!)
+- [RLS_GUIDE.md](RLS_GUIDE.md) - PostgreSQL Row-Level Security
+- [INSTALLATION.md](INSTALLATION.md) - Detailed installation guide
+- [INSTALL_IN_EMPLOYEE_MANAGE.md](INSTALL_IN_EMPLOYEE_MANAGE.md) - Installing in employee_manage
 
-Edit `hub_auth/settings.py`:
+**Examples:** [examples/](examples/) directory
+
+### Usage
 
 ```python
-# Azure AD Configuration
-AZURE_AD_TENANT_ID = 'your-tenant-id'
-AZURE_AD_CLIENT_ID = 'your-client-id'  
-AZURE_AD_CLIENT_SECRET = 'your-client-secret'
+# Django REST Framework with dynamic permissions
+from rest_framework.views import APIView
+from hub_auth_client.django import DynamicPermission
 
-# Database Configuration
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'hub_auth_db',
-        'USER': 'your-db-user',
-        'PASSWORD': 'your-db-password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
+class EmployeeView(APIView):
+    permission_classes = [DynamicPermission]  # Reads from database
+    
+    def get(self, request):
+        # User authenticated with required scopes/roles
+        # Data automatically filtered by RLS if enabled!
+        return Response({'employees': [...]})
 ```
 
-### 4. Run Migrations
+Configure scopes/roles in Django admin - no code changes needed!
+
+---
+
+## 🔧 Original Hub Auth Service (Optional)
+
+The original Django service that provides centralized authentication. This is now **optional** - most projects should use the **hub-auth-client package** instead.
+
+### When to Use the Service
+
+- You need a centralized authentication service
+- You want to sync Azure AD users to a database
+- You need service-to-service authentication with API keys
+
+### Quick Start (Service)
 
 ```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your Azure AD credentials
+
+# Run migrations
+python manage.py migrate
+
+# Create superuser
+python manage.py createsuperuser
+
+# Run development server
+python manage.py runserver
+```
+
+### Service Documentation
+
+See the original [Hub Auth Service README](hub_auth/README_SERVICE.md) for details on running the Django service.
+
+---
+
+## 📚 Complete Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [START_HERE.md](START_HERE.md) | Documentation index - start here |
+| [QUICKSTART.md](QUICKSTART.md) | Quick start guide |
+| [README_PACKAGE.md](README_PACKAGE.md) | Complete package documentation |
+| [DYNAMIC_PERMISSIONS.md](DYNAMIC_PERMISSIONS.md) | Database-driven permissions |
+| [INSTALLATION.md](INSTALLATION.md) | Installation guide |
+| [INSTALL_IN_EMPLOYEE_MANAGE.md](INSTALL_IN_EMPLOYEE_MANAGE.md) | Installing in employee_manage |
+| [examples/](examples/) | Code examples |
+
+## 🚀 Recommended Workflow
+
+1. **Install the package** in your Django project
+2. **Configure** Azure AD credentials
+3. **Choose approach**:
+   - Use `DynamicPermission` for database-driven config (flexible)
+   - Use `HasScopes`/`HasRoles` for hardcoded config (simple)
+4. **Configure** scopes/roles in Django admin (if using dynamic permissions)
+5. **Test** with MSAL tokens
+
+## 📦 Package vs Service
+
+### Use the Package (hub-auth-client) When:
+- ✅ You want to validate tokens in your own Django app
+- ✅ You need scope/role-based permissions
+- ✅ You want flexible, database-driven configuration
+- ✅ You have multiple projects with different requirements
+
+### Use the Service (hub_auth) When:
+- ⚠️ You need centralized user synchronization
+- ⚠️ You need service-to-service API keys
+- ⚠️ You want a dedicated authentication microservice
+
+**Most projects should use the package.**
+
+## 🛠️ Development
+
+```bash
+# Build package
+python -m build
+
+# Run tests
+pytest tests/
+
+# Install in editable mode
+pip install -e .
 python manage.py makemigrations
 python manage.py migrate
 ```

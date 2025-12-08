@@ -1,0 +1,10 @@
+# Test dependencies
+pytest>=7.4.0
+pytest-django>=4.5.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.1
+
+# Django for integration tests
+Django>=4.2
+djangorestframework>=3.14.0
+psycopg2-binary>=2.9.0  # For testing PostgreSQL features

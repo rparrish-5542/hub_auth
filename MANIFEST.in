@@ -1,0 +1,11 @@
+include README_PACKAGE.md
+include LICENSE
+include pyproject.toml
+include setup.py
+recursive-include hub_auth_client *.py
+recursive-exclude tests *
+recursive-exclude hub_auth_service *
+exclude docker-compose.yml
+exclude Dockerfile
+exclude manage.py
+exclude requirements.txt
