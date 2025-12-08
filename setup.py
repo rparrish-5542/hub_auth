@@ -7,12 +7,12 @@ with open("README_PACKAGE.md", "r", encoding="utf-8") as fh:
 setup(
     name="hub-auth-client",
     version="1.0.0",
-    author="Your Organization",
-    author_email="your-email@example.com",
+    author="rparrish-5542",
+    author_email="rparrish@example.com",
     description="MSAL JWT validation library with Entra ID RBAC support",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/your-org/hub-auth-client",
+    url="https://github.com/rparrish-5542/hub_auth",
     packages=find_packages(exclude=["tests", "tests.*", "hub_auth", "authentication", "services"]),
     classifiers=[
         "Development Status :: 4 - Beta",
@@ -52,7 +52,7 @@ setup(
     },
     keywords="msal jwt azure entra authentication rbac validation",
     project_urls={
-        "Bug Reports": "https://github.com/your-org/hub-auth-client/issues",
-        "Source": "https://github.com/your-org/hub-auth-client",
+        "Bug Reports": "https://github.com/rparrish-5542/hub_auth/issues",
+        "Source": "https://github.com/rparrish-5542/hub_auth",
     },
 )

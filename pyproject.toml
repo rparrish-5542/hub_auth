@@ -10,7 +10,7 @@ readme = "README_PACKAGE.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
 authors = [
-    {name = "Your Organization", email = "your-email@example.com"}
+    {name = "rparrish-5542", email = "rparrish@example.com"}
 ]
 keywords = ["msal", "jwt", "azure", "entra", "authentication", "rbac", "validation"]
 classifiers = [
@@ -41,10 +41,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/your-org/hub-auth-client"
-Documentation = "https://github.com/your-org/hub-auth-client/blob/main/README_PACKAGE.md"
-Repository = "https://github.com/your-org/hub-auth-client"
-Issues = "https://github.com/your-org/hub-auth-client/issues"
+Homepage = "https://github.com/rparrish-5542/hub_auth"
+Documentation = "https://github.com/rparrish-5542/hub_auth/blob/main/README_PACKAGE.md"
+Repository = "https://github.com/rparrish-5542/hub_auth"
+Issues = "https://github.com/rparrish-5542/hub_auth/issues"
 
 [tool.setuptools]
 packages = ["hub_auth_client"]
