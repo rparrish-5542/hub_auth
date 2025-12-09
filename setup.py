@@ -6,7 +6,7 @@ with open("README_PACKAGE.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="hub-auth-client",
-    version="1.0.0",
+    version="1.0.34",
     author="rparrish-5542",
     author_email="rparrish@example.com",
     description="MSAL JWT validation library with Entra ID RBAC support",

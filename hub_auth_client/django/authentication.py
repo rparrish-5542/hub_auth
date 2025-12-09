@@ -82,7 +82,7 @@ class MSALAuthentication(authentication.BaseAuthentication):
             
             if db_config:
                 logger.info(f"Using Azure AD configuration '{db_config.name}' from database")
-                self.validator = db_config.get_validator()
+                self.validator = db_config.create_validator()
                 self.exempt_paths = db_config.get_exempt_paths()
                 return
         except Exception as e:

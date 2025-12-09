@@ -1,0 +1,99 @@
+/* Styling for API Endpoint Mappings admin view */
+
+/* Table styling */
+#result_list {
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+#result_list thead th {
+    background: linear-gradient(to bottom, #f9f9f9, #ececec);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    padding: 12px 10px;
+}
+
+#result_list tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+}
+
+#result_list tbody tr:hover {
+    background-color: #f5f9ff;
+}
+
+#result_list tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+#result_list tbody tr:nth-child(even):hover {
+    background-color: #f5f9ff;
+}
+
+#result_list td {
+    padding: 10px;
+    vertical-align: middle;
+}
+
+/* ViewSet column - make it stand out */
+#result_list td:first-child {
+    font-weight: 600;
+    min-width: 200px;
+}
+
+/* URL Pattern column */
+#result_list td:nth-child(2) {
+    font-family: 'Courier New', Courier, monospace;
+    min-width: 300px;
+}
+
+/* Action column */
+#result_list td:nth-child(3) {
+    min-width: 200px;
+}
+
+/* Serializer column */
+#result_list td:nth-child(4) {
+    font-family: 'Courier New', Courier, monospace;
+    min-width: 250px;
+}
+
+/* App column */
+#result_list td:nth-child(5) {
+    text-align: center;
+    min-width: 100px;
+}
+
+/* Remove action checkboxes column since this is read-only */
+#result_list th.action-checkbox-column,
+#result_list td.action-checkbox {
+    display: none;
+}
+
+/* Improve code blocks */
+code {
+    font-size: 12px;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* Header info text */
+.aligned label {
+    font-weight: 600;
+}
+
+/* Improve spacing for changelist */
+#changelist {
+    padding: 10px;
+}
+
+#changelist-filter {
+    display: none; /* Hide filter sidebar for this view */
+}
+
+/* Message styling */
+.messagelist {
+    margin: 0 0 20px 0;
+}

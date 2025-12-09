@@ -135,6 +135,12 @@ class MSALTokenValidator:
             if not kid:
                 return False, None, "Token missing 'kid' in header"
             
+            # Decode without verification to see claims for debugging
+            unverified_claims = jwt.decode(token, options={"verify_signature": False})
+            logger.debug(f"Token tenant_id: {unverified_claims.get('tid')}, expected: {self.tenant_id}")
+            logger.debug(f"Token audience: {unverified_claims.get('aud')}, expected: {self.client_id}")
+            logger.debug(f"Token issuer: {unverified_claims.get('iss')}, expected: {self.issuer_v1} or {self.issuer_v2}")
+            
             # Get the signing key from Azure AD's JWKS endpoint
             signing_key = self.jwks_client.get_signing_key(kid)
             
@@ -144,7 +150,7 @@ class MSALTokenValidator:
                 "verify_exp": True,
                 "verify_nbf": True,
                 "verify_iat": True,
-                "verify_aud": self.validate_audience,
+                "verify_aud": False,  # We'll validate audience manually to support both formats
                 "verify_iss": self.validate_issuer,
             }
             
@@ -153,11 +159,21 @@ class MSALTokenValidator:
                 token,
                 signing_key.key,
                 algorithms=["RS256"],
-                audience=self.client_id if self.validate_audience else None,
+                audience=None,  # We'll validate audience manually to support both formats
                 issuer=None,  # We'll validate issuer manually to support both v1 and v2
                 options=options,
                 leeway=self.leeway,
             )
+            
+            # Validate audience manually (support both "client_id" and "api://client_id")
+            if self.validate_audience:
+                token_audience = decoded_token.get('aud')
+                valid_audiences = [
+                    self.client_id,
+                    f"api://{self.client_id}",
+                ]
+                if token_audience not in valid_audiences:
+                    return False, decoded_token, f"Invalid audience: {token_audience}. Expected: {self.client_id} or api://{self.client_id}"
             
             # Validate issuer manually (support both v1.0 and v2.0)
             if self.validate_issuer:
@@ -188,12 +204,16 @@ class MSALTokenValidator:
         except jwt.ExpiredSignatureError:
             return False, None, "Token has expired"
         except jwt.InvalidAudienceError as e:
+            logger.error(f"Invalid audience error: {str(e)}")
             return False, None, f"Invalid audience: {str(e)}"
         except jwt.InvalidIssuerError as e:
+            logger.error(f"Invalid issuer error: {str(e)}")
             return False, None, f"Invalid issuer: {str(e)}"
-        except jwt.InvalidSignatureError:
+        except jwt.InvalidSignatureError as e:
+            logger.error(f"Invalid signature error: {str(e)}. JWKS URI: {self.jwks_uri}")
             return False, None, "Invalid signature"
         except jwt.DecodeError as e:
+            logger.error(f"Token decode error: {str(e)}")
             return False, None, f"Token decode error: {str(e)}"
         except Exception as e:
             logger.error(f"Unexpected error validating token: {str(e)}", exc_info=True)

@@ -1,0 +1,76 @@
+/* Azure AD Configuration Admin Styling */
+
+.sensitive-field-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+}
+
+.sensitive-field {
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.sensitive-field.masked {
+    color: #6c757d;
+}
+
+.sensitive-field.revealed {
+    color: #212529;
+    user-select: text;
+}
+
+.reveal-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.reveal-btn:hover {
+    background: #e9ecef;
+}
+
+.reveal-btn:active {
+    background: #dee2e6;
+}
+
+.eye-icon {
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.reveal-btn:hover .eye-icon {
+    transform: scale(1.1);
+}
+
+/* List view masked fields */
+.masked-field {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 12px;
+    color: #6c757d;
+    background: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+}
+
+/* Readonly field styling */
+.form-row .readonly {
+    padding-top: 0;
+}
+
+.form-row .sensitive-field-wrapper {
+    margin-top: 5px;
+}

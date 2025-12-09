@@ -54,12 +54,6 @@ class AzureADConfiguration(models.Model):
     )
     
     # Token validation settings
-    allowed_audiences = models.JSONField(
-        default=list,
-        blank=True,
-        help_text="List of allowed audience values (default: [client_id])"
-    )
-    
     token_version = models.CharField(
         max_length=10,
         choices=[
@@ -137,12 +131,6 @@ class AzureADConfiguration(models.Model):
         self.clean()
         super().save(*args, **kwargs)
     
-    def get_allowed_audiences(self):
-        """Get allowed audiences, defaulting to client_id if not set."""
-        if self.allowed_audiences:
-            return self.allowed_audiences
-        return [self.client_id]
-    
     def get_exempt_paths(self):
         """Get exempt paths as a list."""
         if self.exempt_paths:
@@ -159,11 +147,9 @@ class AzureADConfiguration(models.Model):
         return {
             'tenant_id': self.tenant_id,
             'client_id': self.client_id,
-            'allowed_audiences': self.get_allowed_audiences(),
-            'token_version': self.token_version,
             'validate_audience': self.validate_audience,
             'validate_issuer': self.validate_issuer,
-            'token_leeway': self.token_leeway,
+            'leeway': self.token_leeway,
         }
     
     @classmethod
@@ -181,6 +167,17 @@ class AzureADConfiguration(models.Model):
         except cls.MultipleObjectsReturned:
             # Shouldn't happen due to validation, but handle it
             return cls.objects.filter(is_active=True).first()
+    
+    def create_validator(self):
+        """
+        Create a configured MSALTokenValidator instance from this config.
+        
+        Returns:
+            MSALTokenValidator instance
+        """
+        from hub_auth_client import MSALTokenValidator
+        
+        return MSALTokenValidator(**self.get_validator_config())
     
     @classmethod
     def get_validator(cls):

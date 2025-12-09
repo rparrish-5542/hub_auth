@@ -193,3 +193,17 @@ class EndpointPermission(models.Model):
     def get_required_role_names(self):
         """Get list of required role names."""
         return list(self.required_roles.filter(is_active=True).values_list('name', flat=True))
+
+
+class APIEndpointMapping(models.Model):
+    """
+    Virtual model for displaying API endpoint to serializer mappings.
+    
+    This model doesn't have a database table - it's used to dynamically
+    discover ViewSets and their serializers from the installed Django app.
+    """
+    
+    class Meta:
+        managed = False  # This is a virtual model, no database table
+        verbose_name = 'API Endpoint Mapping'
+        verbose_name_plural = 'API Endpoint Mappings'

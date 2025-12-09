@@ -1,0 +1,227 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static 'admin/css/changelists.css' %}">
+<style>
+    .endpoint-list {
+        margin: 20px 0;
+    }
+    .endpoint-item {
+        padding: 15px;
+        margin: 10px 0;
+        background: #f9f9f9;
+        border-left: 4px solid #417690;
+        display: flex;
+        align-items: center;
+    }
+    .endpoint-item:hover {
+        background: #f0f0f0;
+    }
+    .endpoint-checkbox {
+        margin-right: 15px;
+        transform: scale(1.3);
+        cursor: pointer;
+    }
+    .endpoint-details {
+        flex-grow: 1;
+    }
+    .endpoint-url {
+        font-weight: bold;
+        color: #333;
+        font-size: 14px;
+    }
+    .endpoint-methods {
+        display: inline-block;
+        background: #417690;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+        margin-left: 10px;
+    }
+    .endpoint-view {
+        color: #666;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+    .endpoint-serializer {
+        color: #888;
+        font-size: 11px;
+        font-style: italic;
+    }
+    .filter-section {
+        background: #fff;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    .filter-options {
+        display: flex;
+        gap: 30px;
+        align-items: center;
+    }
+    .filter-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .filter-option input[type="checkbox"],
+    .filter-option input[type="radio"] {
+        transform: scale(1.2);
+        cursor: pointer;
+    }
+    .filter-option label {
+        cursor: pointer;
+        margin: 0;
+    }
+    .action-buttons {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        padding: 15px;
+        border-top: 1px solid #ddd;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+        display: flex;
+        gap: 10px;
+    }
+    .btn-primary {
+        background-color: #417690;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .btn-primary:hover {
+        background-color: #356677;
+    }
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+    .select-all-wrapper {
+        margin: 15px 0;
+        padding: 10px;
+        background: #e8f4f8;
+        border-radius: 4px;
+    }
+    .results-count {
+        font-weight: bold;
+        color: #417690;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Home</a>
+    &rsaquo; <a href="{% url 'admin:hub_auth_client_endpointpermission_changelist' %}">Endpoint permissions</a>
+    &rsaquo; Discover Unsecured Endpoints
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>Discover Unsecured Endpoints</h1>
+    
+    <form method="get" id="filterForm">
+        <div class="filter-section">
+            <h3>Filter Options</h3>
+            <div class="filter-options">
+                <div class="filter-option">
+                    <input type="checkbox" id="unsecuredOnly" name="unsecured_only" value="1" 
+                           {% if unsecured_only %}checked{% endif %}>
+                    <label for="unsecuredOnly">Show only unsecured endpoints</label>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="ignoreAdmin" name="ignore_admin" value="1" 
+                           {% if ignore_admin %}checked{% endif %}>
+                    <label for="ignoreAdmin">Ignore admin views</label>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="ignoreStatic" name="ignore_static" value="1" 
+                           {% if ignore_static %}checked{% endif %}>
+                    <label for="ignoreStatic">Ignore static/media URLs</label>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    {% if endpoints %}
+        <div class="results-count">
+            Found {{ endpoints|length }} endpoint(s)
+        </div>
+
+        <div class="select-all-wrapper">
+            <input type="checkbox" id="selectAll">
+            <label for="selectAll" style="cursor: pointer; font-weight: bold;">Select All / Deselect All</label>
+        </div>
+
+        <form method="post" action="{% url 'admin:create_endpoint_permissions' %}" id="endpointForm">
+            {% csrf_token %}
+            <div class="endpoint-list">
+                {% for endpoint in endpoints %}
+                <div class="endpoint-item">
+                    <input type="checkbox" class="endpoint-checkbox" name="endpoints" 
+                           value="{{ endpoint.url_pattern }}|{{ endpoint.http_methods }}|{{ endpoint.view_name }}|{{ endpoint.serializer_class }}">
+                    <div class="endpoint-details">
+                        <div class="endpoint-url">
+                            <div title="Regex: {{ endpoint.url_pattern }}">
+                                <strong>{{ endpoint.url_pattern }}</strong>
+                                {% if endpoint.url_pattern_readable %}
+                                <br><small style="color: #666;">{{ endpoint.url_pattern_readable }}</small>
+                                {% endif %}
+                            </div>
+                            <span class="endpoint-methods">{{ endpoint.http_methods }}</span>
+                        </div>
+                        <div class="endpoint-view">
+                            View: {{ endpoint.view_name }}
+                            {% if endpoint.app_name %}({{ endpoint.app_name }}){% endif %}
+                        </div>
+                        {% if endpoint.serializer_class %}
+                        <div class="endpoint-serializer">
+                            Serializer: {{ endpoint.serializer_class }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="action-buttons">
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    Create Permissions for Selected Endpoints
+                </button>
+                <button type="button" class="btn-secondary" id="cancelBtn" 
+                        data-cancel-url="{% url 'admin:hub_auth_client_endpointpermission_changelist' %}">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    {% else %}
+        <div class="results-count" style="color: #28a745;">
+            ✅ No endpoints found matching the selected filters.
+            {% if unsecured_only %}All endpoints are secured!{% endif %}
+        </div>
+        <br>
+        <button type="button" class="btn-secondary" id="backBtn"
+                data-back-url="{% url 'admin:hub_auth_client_endpointpermission_changelist' %}">
+            Back to Endpoint Permissions
+        </button>
+    {% endif %}
+</div>
+
+<script src="{% static 'admin/js/discover_endpoints.js' %}"></script>
+{% endblock %}

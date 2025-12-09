@@ -38,8 +38,19 @@ class DynamicScopePermission(permissions.BasePermission):
             logger.debug(f"No endpoint permission found for {request.path}")
             return True
         
-        # Get required scopes
+        # Check if any scopes are configured (even if inactive)
+        total_configured_scopes = endpoint_perm.required_scopes.count()
+        
+        # Get required scopes (active only)
         required_scopes = endpoint_perm.get_required_scope_names()
+        
+        if total_configured_scopes > 0 and not required_scopes:
+            # Scopes are configured but none are active - DENY access
+            logger.warning(
+                f"Scope check failed for {request.user.username} on {request.path}. "
+                f"Scopes are configured ({total_configured_scopes}) but none are active/valid."
+            )
+            return False
         
         if not required_scopes:
             # No scopes required
@@ -132,8 +143,19 @@ class DynamicRolePermission(permissions.BasePermission):
             logger.debug(f"No endpoint permission found for {request.path}")
             return True
         
-        # Get required roles
+        # Check if any roles are configured (even if inactive)
+        total_configured_roles = endpoint_perm.required_roles.count()
+        
+        # Get required roles (active only)
         required_roles = endpoint_perm.get_required_role_names()
+        
+        if total_configured_roles > 0 and not required_roles:
+            # Roles are configured but none are active - DENY access
+            logger.warning(
+                f"Role check failed for {request.user.username} on {request.path}. "
+                f"Roles are configured ({total_configured_roles}) but none are active/valid."
+            )
+            return False
         
         if not required_roles:
             # No roles required

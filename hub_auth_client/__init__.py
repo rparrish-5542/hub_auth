@@ -5,7 +5,7 @@ This package provides standalone JWT token validation for Microsoft Entra ID (Az
 tokens with support for scope-based RBAC.
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.34"
 __author__ = "Your Organization"
 
 from .validator import MSALTokenValidator

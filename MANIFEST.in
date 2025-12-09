@@ -3,6 +3,8 @@ include LICENSE
 include pyproject.toml
 include setup.py
 recursive-include hub_auth_client *.py
+recursive-include hub_auth_client/django/static *.css *.js
+recursive-include hub_auth_client/django/templates *.html
 recursive-exclude tests *
 recursive-exclude hub_auth_service *
 exclude docker-compose.yml
