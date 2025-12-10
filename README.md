@@ -19,6 +19,7 @@ A reusable Python package for validating MSAL JWT tokens with Microsoft Entra ID
 - ✅ **Django Integration** - Middleware, authentication backends, permissions
 - ✅ **Pip Installable** - Easy installation in any project
 - ✅ **Flexible** - Works standalone or with Django
+- ✅ **App-Signed JWTs** - Optional fallback for endpoints secured with your own shared-secret tokens
 
 ### Quick Start
 
@@ -48,6 +49,22 @@ pip install c:\Users\rparrish\GitHub\micro_service\hub_auth
 **Examples:** [examples/](examples/) directory
 
 ### Usage
+
+#### App-Signed JWTs (Optional)
+
+You can allow services to call your API with an app-issued JWT (shared secret) alongside Entra ID tokens. Configure these settings in Django:
+
+```python
+APP_JWT_ENABLED = True
+APP_JWT_SECRET = "super-secret-key"  # required when enabled
+APP_JWT_ISSUER = "my-service"        # optional
+APP_JWT_AUDIENCE = "my-api"          # optional
+APP_JWT_ALGORITHMS = ["HS256"]       # optional, defaults to HS256
+APP_JWT_REQUIRE_EXP = True            # optional, defaults to True
+APP_JWT_LEEWAY = 0                    # optional seconds of leeway
+```
+
+When enabled, the middleware/auth backend will try MSAL first, then validate the app JWT. The same `Authorization: Bearer <token>` header is used.
 
 ```python
 # Django REST Framework with dynamic permissions

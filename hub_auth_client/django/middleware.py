@@ -14,7 +14,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.utils.deprecation import MiddlewareMixin
 
-from ..validator import MSALTokenValidator
+from ..validator import MSALTokenValidator, AppTokenValidator
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +54,8 @@ class MSALAuthenticationMiddleware(MiddlewareMixin):
             validate_issuer=getattr(settings, 'MSAL_VALIDATE_ISSUER', True),
             leeway=getattr(settings, 'MSAL_TOKEN_LEEWAY', 0),
         )
+
+        self.app_validator = self._build_app_validator()
         
         # Get exempt paths
         self.exempt_paths = getattr(settings, 'MSAL_EXEMPT_PATHS', [])
@@ -75,6 +77,11 @@ class MSALAuthenticationMiddleware(MiddlewareMixin):
         
         # Validate token
         is_valid, claims, error = self.validator.validate_token(auth_header)
+        used_app_token = False
+
+        if not is_valid and self.app_validator:
+            is_valid, claims, error = self.app_validator.validate_token(auth_header)
+            used_app_token = is_valid
         
         if not is_valid:
             return JsonResponse(
@@ -84,6 +91,29 @@ class MSALAuthenticationMiddleware(MiddlewareMixin):
         
         # Attach claims and user info to request
         request.msal_token = claims
-        request.msal_user = self.validator.extract_user_info(claims)
+        if used_app_token:
+            request.msal_user = self.app_validator.extract_user_info(claims)
+        else:
+            request.msal_user = self.validator.extract_user_info(claims)
         
         return None
+
+    def _build_app_validator(self) -> Optional[AppTokenValidator]:
+        if not getattr(settings, 'APP_JWT_ENABLED', False):
+            return None
+
+        secret = getattr(settings, 'APP_JWT_SECRET', None)
+        if not secret:
+            logger.warning("APP_JWT_ENABLED is True but APP_JWT_SECRET is not set; disabling app token auth")
+            return None
+
+        algorithms = getattr(settings, 'APP_JWT_ALGORITHMS', ['HS256'])
+
+        return AppTokenValidator(
+            secret=secret,
+            issuer=getattr(settings, 'APP_JWT_ISSUER', None),
+            audience=getattr(settings, 'APP_JWT_AUDIENCE', None),
+            algorithms=algorithms,
+            leeway=getattr(settings, 'APP_JWT_LEEWAY', 0),
+            require_exp=getattr(settings, 'APP_JWT_REQUIRE_EXP', True),
+        )

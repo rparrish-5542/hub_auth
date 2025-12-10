@@ -12,7 +12,7 @@ with support for:
 
 import logging
 import time
-from typing import Dict, Optional, List, Any, Tuple
+from typing import Dict, Optional, List, Any, Tuple, Sequence
 from datetime import datetime, timezone
 import jwt
 from jwt import PyJWKClient
@@ -28,6 +28,175 @@ from .exceptions import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+class AppTokenValidator:
+    """Validates application-signed JWTs using a shared secret.
+
+    This is intended for service-to-service calls where the app issues its own
+    JWTs instead of Entra ID. Audience/issuer validation is optional and can be
+    configured through settings.
+    """
+
+    def __init__(
+        self,
+        secret: str,
+        issuer: Optional[str] = None,
+        audience: Optional[str] = None,
+        algorithms: Optional[Sequence[str]] = None,
+        leeway: int = 0,
+        require_exp: bool = True,
+    ) -> None:
+        self.secret = secret
+        self.issuer = issuer
+        self.audience = audience
+        self.algorithms = list(algorithms) if algorithms else ["HS256"]
+        self.leeway = leeway
+        self.require_exp = require_exp
+
+    def validate_token(
+        self,
+        token: str,
+        required_scopes: Optional[List[str]] = None,
+        required_roles: Optional[List[str]] = None,
+        require_all_scopes: bool = False,
+        require_all_roles: bool = False,
+    ) -> Tuple[bool, Optional[Dict[str, Any]], Optional[str]]:
+        if token.startswith("Bearer "):
+            token = token[7:]
+
+        try:
+            options = {
+                "require": ["exp"] if self.require_exp else [],
+                "verify_exp": self.require_exp,
+                "verify_aud": bool(self.audience),
+                "verify_iss": bool(self.issuer),
+            }
+
+            decoded_token = jwt.decode(
+                token,
+                self.secret,
+                algorithms=self.algorithms,
+                audience=self.audience,
+                issuer=self.issuer,
+                options=options,
+                leeway=self.leeway,
+            )
+
+            validation_error = self._validate_claims(
+                decoded_token,
+                required_scopes,
+                required_roles,
+                require_all_scopes,
+                require_all_roles,
+            )
+
+            if validation_error:
+                return False, decoded_token, validation_error
+
+            return True, decoded_token, None
+
+        except jwt.ExpiredSignatureError:
+            return False, None, "Token has expired"
+        except jwt.InvalidAudienceError as exc:
+            logger.error("Invalid audience for app token: %s", str(exc))
+            return False, None, f"Invalid audience: {str(exc)}"
+        except jwt.InvalidIssuerError as exc:
+            logger.error("Invalid issuer for app token: %s", str(exc))
+            return False, None, f"Invalid issuer: {str(exc)}"
+        except jwt.InvalidSignatureError as exc:
+            logger.error("Invalid signature for app token: %s", str(exc))
+            return False, None, "Invalid signature"
+        except jwt.DecodeError as exc:
+            logger.error("Token decode error for app token: %s", str(exc))
+            return False, None, f"Token decode error: {str(exc)}"
+        except Exception as exc:  # pragma: no cover - safety net
+            logger.error("Unexpected error validating app token: %s", str(exc), exc_info=True)
+            return False, None, f"Validation error: {str(exc)}"
+
+    def _validate_claims(
+        self,
+        decoded_token: Dict[str, Any],
+        required_scopes: Optional[List[str]],
+        required_roles: Optional[List[str]],
+        require_all_scopes: bool,
+        require_all_roles: bool,
+    ) -> Optional[str]:
+        # App tokens are expected to carry at least a subject
+        if "sub" not in decoded_token:
+            return "Missing required claim: sub"
+
+        if required_scopes:
+            error = self._validate_scopes(decoded_token, required_scopes, require_all_scopes)
+            if error:
+                return error
+
+        if required_roles:
+            error = self._validate_roles(decoded_token, required_roles, require_all_roles)
+            if error:
+                return error
+
+        return None
+
+    def _validate_scopes(
+        self,
+        decoded_token: Dict[str, Any],
+        required_scopes: List[str],
+        require_all: bool,
+    ) -> Optional[str]:
+        token_scopes = []
+        scp = decoded_token.get("scp", "")
+        if scp:
+            token_scopes.extend(scp.split())
+
+        scopes_list = decoded_token.get("scopes", [])
+        if scopes_list:
+            token_scopes.extend(scopes_list)
+
+        if not token_scopes:
+            return f"Token has no scopes. Required: {required_scopes}"
+
+        if require_all:
+            missing_scopes = set(required_scopes) - set(token_scopes)
+            if missing_scopes:
+                return f"Missing required scopes: {missing_scopes}. Token has: {token_scopes}"
+        else:
+            if not any(scope in token_scopes for scope in required_scopes):
+                return f"Token missing any of required scopes: {required_scopes}. Token has: {token_scopes}"
+
+        return None
+
+    def _validate_roles(
+        self,
+        decoded_token: Dict[str, Any],
+        required_roles: List[str],
+        require_all: bool,
+    ) -> Optional[str]:
+        token_roles = decoded_token.get("roles", [])
+        if not token_roles:
+            return f"Token has no roles. Required: {required_roles}"
+
+        if require_all:
+            missing_roles = set(required_roles) - set(token_roles)
+            if missing_roles:
+                return f"Missing required roles: {missing_roles}. Token has: {token_roles}"
+        else:
+            if not any(role in token_roles for role in required_roles):
+                return f"Token missing any of required roles: {required_roles}. Token has: {token_roles}"
+
+        return None
+
+    def extract_user_info(self, decoded_token: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            "subject": decoded_token.get("sub"),
+            "email": decoded_token.get("email"),
+            "name": decoded_token.get("name"),
+            "scopes": decoded_token.get("scp", "").split() if decoded_token.get("scp") else decoded_token.get("scopes", []),
+            "roles": decoded_token.get("roles", []),
+            "groups": decoded_token.get("groups", []),
+            "audience": decoded_token.get("aud"),
+            "issuer": decoded_token.get("iss"),
+        }
 
 
 class MSALTokenValidator:

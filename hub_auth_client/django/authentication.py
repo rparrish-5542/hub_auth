@@ -15,7 +15,7 @@ from django.conf import settings
 from rest_framework import authentication
 from rest_framework.exceptions import AuthenticationFailed
 
-from ..validator import MSALTokenValidator
+from ..validator import MSALTokenValidator, AppTokenValidator
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +84,7 @@ class MSALAuthentication(authentication.BaseAuthentication):
                 logger.info(f"Using Azure AD configuration '{db_config.name}' from database")
                 self.validator = db_config.create_validator()
                 self.exempt_paths = db_config.get_exempt_paths()
+                self.app_validator = self._build_app_validator()
                 return
         except Exception as e:
             logger.debug(f"Could not load config from database: {e}")
@@ -107,6 +108,28 @@ class MSALAuthentication(authentication.BaseAuthentication):
             leeway=getattr(settings, 'MSAL_TOKEN_LEEWAY', 0),
         )
         self.exempt_paths = getattr(settings, 'MSAL_EXEMPT_PATHS', [])
+
+        self.app_validator = self._build_app_validator()
+
+    def _build_app_validator(self) -> Optional[AppTokenValidator]:
+        if not getattr(settings, 'APP_JWT_ENABLED', False):
+            return None
+
+        secret = getattr(settings, 'APP_JWT_SECRET', None)
+        if not secret:
+            logger.warning("APP_JWT_ENABLED is True but APP_JWT_SECRET is not set; disabling app token auth")
+            return None
+
+        algorithms = getattr(settings, 'APP_JWT_ALGORITHMS', ['HS256'])
+
+        return AppTokenValidator(
+            secret=secret,
+            issuer=getattr(settings, 'APP_JWT_ISSUER', None),
+            audience=getattr(settings, 'APP_JWT_AUDIENCE', None),
+            algorithms=algorithms,
+            leeway=getattr(settings, 'APP_JWT_LEEWAY', 0),
+            require_exp=getattr(settings, 'APP_JWT_REQUIRE_EXP', True),
+        )
     
     def authenticate(self, request) -> Optional[Tuple[MSALUser, dict]]:
         """
@@ -137,12 +160,17 @@ class MSALAuthentication(authentication.BaseAuthentication):
         
         # Validate token
         is_valid, claims, error = self.validator.validate_token(auth_header)
+        used_app_token = False
+
+        if not is_valid and self.app_validator:
+            is_valid, claims, error = self.app_validator.validate_token(auth_header)
+            used_app_token = is_valid
         
         if not is_valid:
             raise AuthenticationFailed(error or 'Invalid token')
         
         # Create user object from claims
-        user = MSALUser(claims)
+        user = MSALUser(claims) if not used_app_token else MSALUser(claims)
         
         return (user, claims)
     
