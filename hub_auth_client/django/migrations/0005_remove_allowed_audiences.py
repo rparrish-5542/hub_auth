@@ -1,12 +1,8 @@
 """
-Migration to remove allowed_audiences field from AzureADConfiguration.
-
-The MSALTokenValidator now uses client_id as the audience automatically,
-so this field is no longer needed.
+Migration to safely remove allowed_audiences field from AzureADConfiguration.
 """
 
 from django.db import migrations
-
 
 class Migration(migrations.Migration):
 
@@ -15,8 +11,14 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='azureadconfiguration',
-            name='allowed_audiences',
+        migrations.RunSQL(
+            sql="""
+                ALTER TABLE hub_auth_client_azureadconfiguration
+                DROP COLUMN IF EXISTS allowed_audiences CASCADE;
+            """,
+            reverse_sql="""
+                ALTER TABLE hub_auth_client_azureadconfiguration
+                ADD COLUMN allowed_audiences JSONB DEFAULT '[]';
+            """
         ),
     ]

@@ -10,15 +10,20 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameIndex(
-            model_name='endpointpermission',
-            new_name='hub_auth_cl_url_pat_6a85ac_idx',
-            old_name='hub_auth_cl_url_pat_idx',
-        ),
-        migrations.RenameIndex(
-            model_name='endpointpermission',
-            new_name='hub_auth_cl_priorit_2c25b4_idx',
-            old_name='hub_auth_cl_priorit_idx',
+        # Use RunSQL with IF EXISTS to safely rename indexes only if they exist
+        migrations.RunSQL(
+            sql="""
+                ALTER INDEX IF EXISTS hub_auth_cl_url_pat_idx
+                RENAME TO hub_auth_cl_url_pat_6a85ac_idx;
+                ALTER INDEX IF EXISTS hub_auth_cl_priorit_idx
+                RENAME TO hub_auth_cl_priorit_2c25b4_idx;
+            """,
+            reverse_sql="""
+                ALTER INDEX IF EXISTS hub_auth_cl_url_pat_6a85ac_idx
+                RENAME TO hub_auth_cl_url_pat_idx;
+                ALTER INDEX IF EXISTS hub_auth_cl_priorit_2c25b4_idx
+                RENAME TO hub_auth_cl_priorit_idx;
+            """
         ),
         migrations.AlterField(
             model_name='rlspolicy',
