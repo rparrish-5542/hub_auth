@@ -167,10 +167,6 @@ pytest tests/
 2. Read [INSTALLATION.md](INSTALLATION.md) - Detailed guide
 3. Run `verify_install.py` - Verify it works
 
-### "I want to install in employee_manage specifically"
-1. Read [INSTALL_IN_EMPLOYEE_MANAGE.md](INSTALL_IN_EMPLOYEE_MANAGE.md)
-2. Follow step-by-step instructions
-3. Test with real tokens
 
 ### "I want database-driven permissions"
 1. Read [DYNAMIC_PERMISSIONS.md](DYNAMIC_PERMISSIONS.md) - Complete guide
@@ -226,7 +222,6 @@ pytest tests/ -v
 
 ## 🎊 What You Can Do
 
-1. ✅ Install in employee_manage
 2. ✅ Install in other microservices
 3. ✅ Use scope-based RBAC
 4. ✅ Use role-based RBAC
