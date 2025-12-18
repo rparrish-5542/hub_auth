@@ -6,7 +6,7 @@ tokens with support for scope-based RBAC.
 """
 
 __version__ = "1.0.37"
-__author__ = "Your Organization"
+__author__ = "Ryan Parrish - Wedgwood Christian Services"
 
 from .validator import MSALTokenValidator, AppTokenValidator
 from .exceptions import (
