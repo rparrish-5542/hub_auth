@@ -29,9 +29,12 @@ class MSALUser:
     
     def __init__(self, claims: dict):
         self.claims = claims
-        self.object_id = claims.get('oid')
-        self.username = claims.get('upn') or claims.get('unique_name') or claims.get('oid')
-        self.email = claims.get('email') or claims.get('preferred_username')
+        # Azure AD uses 'oid' for object ID, but 'sub' can also be used as fallback
+        # V1 tokens: oid is the user's object ID
+        # V2 tokens: oid is present, sub is also available but may be different
+        self.object_id = claims.get('oid') or claims.get('sub')
+        self.username = claims.get('upn') or claims.get('unique_name') or claims.get('preferred_username') or self.object_id
+        self.email = claims.get('email') or claims.get('preferred_username') or claims.get('upn')
         self.name = claims.get('name')
         self.scopes = claims.get('scp', '').split() if claims.get('scp') else claims.get('scopes', [])
         self.roles = claims.get('roles', [])
@@ -39,6 +42,12 @@ class MSALUser:
         self.is_authenticated = True
         self.is_active = True
         self.is_anonymous = False
+        
+        # Log claims for debugging (only in debug mode)
+        if not self.object_id:
+            logger.warning(f"No 'oid' or 'sub' found in token claims. Available keys: {list(claims.keys())}")
+        else:
+            logger.debug(f"MSALUser created with object_id: {self.object_id}")
     
     def __str__(self):
         return self.username or self.object_id

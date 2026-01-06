@@ -10,7 +10,7 @@ readme = "README_PACKAGE.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
 authors = [
-    {name = "rparrish-5542", email = "rparrish@wedgwood.org"}
+    {name = "Ryan Parrish", email = "rparrish@wedgwood.org"}
 ]
 keywords = ["msal", "jwt", "azure", "entra", "authentication", "rbac", "validation"]
 classifiers = [
