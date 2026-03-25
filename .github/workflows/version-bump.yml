@@ -47,37 +47,13 @@ jobs:
       - name: Bump version
         id: bump
         run: |
-          # Get current version
-          CURRENT_VERSION=$(grep "version = " pyproject.toml | cut -d'"' -f2)
+          # Use Python script to bump version (more reliable than sed)
+          python scripts/bump_version.py "${{ inputs.version_type }}"
+          
+          # Read the new versions
+          CURRENT_VERSION=$(python -c "import re; print(re.search(r'version = \"(.+?)\"', open('pyproject.toml').read()).group(1))")
           echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-          
-          # Bump version in both files
-          VERSION_TYPE="${{ inputs.version_type }}"
-          
-          # Parse version
-          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
-          
-          case $VERSION_TYPE in
-            major)
-              NEW_VERSION="$((major + 1)).0.0"
-              ;;
-            minor)
-              NEW_VERSION="$major.$((minor + 1)).0"
-              ;;
-            patch)
-              NEW_VERSION="$major.$minor.$((patch + 1))"
-              ;;
-          esac
-          
-          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          
-          # Update pyproject.toml (use | as delimiter to avoid quote conflicts)
-          sed -i "s|version = \"$CURRENT_VERSION\"|version = \"$NEW_VERSION\"|" pyproject.toml
-          
-          # Update setup.py
-          sed -i "s|version=\"$CURRENT_VERSION\"|version=\"$NEW_VERSION\"|" setup.py
-          
-          echo "Bumped version from $CURRENT_VERSION to $NEW_VERSION"
+          echo "new_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
       - name: Commit changes
         run: |
