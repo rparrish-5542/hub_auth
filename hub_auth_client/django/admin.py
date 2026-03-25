@@ -858,7 +858,8 @@ if RLS_AVAILABLE:
             
             self.message_user(
                 request,
-            mark_safe('<br>'.join(status_messages))
+                mark_safe('<br>'.join(status_messages))
+            )
         check_policy_status.short_description = "Check status of selected policies"
         
         def apply_all_table_policies(self, request, queryset):
@@ -1498,7 +1499,8 @@ if RLS_AVAILABLE:
             
             self.message_user(
                 request,
-            mark_safe('<br>'.join(status_messages))
+                mark_safe('<br>'.join(status_messages))
+            )
         check_table_status.short_description = "Check RLS status for selected tables"
 
 

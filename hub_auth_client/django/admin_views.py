@@ -223,7 +223,7 @@ class MSALAdminCallbackView(View):
         }
         
         try:
-            response = requests.post(token_endpoint, data=data)
+            response = requests.post(token_endpoint, data=data, timeout=30)
             response.raise_for_status()
             return response.json()
         except Exception as e:

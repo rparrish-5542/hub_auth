@@ -133,7 +133,7 @@ class Command(BaseCommand):
         
         try:
             self.stdout.write('Authenticating with Azure AD...')
-            token_response = requests.post(token_url, data=token_data)
+            token_response = requests.post(token_url, data=token_data, timeout=30)
             token_response.raise_for_status()
             access_token = token_response.json()['access_token']
             
@@ -150,7 +150,7 @@ class Command(BaseCommand):
             }
             
             self.stdout.write('Fetching application details from Microsoft Graph...')
-            app_response = requests.get(graph_url, headers=headers, params=params)
+            app_response = requests.get(graph_url, headers=headers, params=params, timeout=30)
             app_response.raise_for_status()
             
             app_data = app_response.json()
@@ -223,7 +223,7 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.WARNING("\nTrying Microsoft Graph beta endpoint for more details..."))
                 try:
                     beta_url = f"https://graph.microsoft.com/beta/applications/{app['id']}"
-                    beta_response = requests.get(beta_url, headers=headers)
+                    beta_response = requests.get(beta_url, headers=headers, timeout=30)
                     beta_response.raise_for_status()
                     beta_app = beta_response.json()
                     

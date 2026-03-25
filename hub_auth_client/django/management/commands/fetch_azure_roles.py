@@ -141,7 +141,7 @@ class Command(BaseCommand):
         
         try:
             self.stdout.write('Authenticating with Azure AD...')
-            token_response = requests.post(token_url, data=token_data)
+            token_response = requests.post(token_url, data=token_data, timeout=30)
             token_response.raise_for_status()
             access_token = token_response.json()['access_token']
             
@@ -159,7 +159,7 @@ class Command(BaseCommand):
             }
             
             self.stdout.write('Fetching application details from Microsoft Graph...')
-            app_response = requests.get(graph_url, headers=headers, params=params)
+            app_response = requests.get(graph_url, headers=headers, params=params, timeout=30)
             app_response.raise_for_status()
             
             app_data = app_response.json()
@@ -248,7 +248,7 @@ class Command(BaseCommand):
                 '$filter': "appId eq '00000003-0000-0000-c000-000000000000'"  # Microsoft Graph
             }
             
-            response = requests.get(ms_graph_sp_url, headers=headers, params=params)
+            response = requests.get(ms_graph_sp_url, headers=headers, params=params, timeout=30)
             response.raise_for_status()
             
             data = response.json()
