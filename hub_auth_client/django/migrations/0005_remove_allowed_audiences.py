@@ -2,7 +2,8 @@
 Migration to safely remove allowed_audiences field from AzureADConfiguration.
 """
 
-from django.db import migrations
+from django.db import migrations, models
+
 
 class Migration(migrations.Migration):
 
@@ -11,14 +12,24 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(
-            sql="""
-                ALTER TABLE hub_auth_client_azureadconfiguration
-                DROP COLUMN IF EXISTS allowed_audiences CASCADE;
-            """,
-            reverse_sql="""
-                ALTER TABLE hub_auth_client_azureadconfiguration
-                ADD COLUMN allowed_audiences JSONB DEFAULT '[]';
-            """
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunSQL(
+                    sql="""
+                        ALTER TABLE hub_auth_client_azureadconfiguration
+                        DROP COLUMN IF EXISTS allowed_audiences CASCADE;
+                    """,
+                    reverse_sql="""
+                        ALTER TABLE hub_auth_client_azureadconfiguration
+                        ADD COLUMN allowed_audiences JSONB DEFAULT '[]';
+                    """
+                ),
+            ],
+            state_operations=[
+                migrations.RemoveField(
+                    model_name='azureadconfiguration',
+                    name='allowed_audiences',
+                ),
+            ],
         ),
     ]

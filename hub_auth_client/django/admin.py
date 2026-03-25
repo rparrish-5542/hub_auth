@@ -4,6 +4,7 @@ Django admin configuration for scope and permission management.
 
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.db import connection
 from django.urls import path, reverse
 from django.shortcuts import redirect, render
@@ -113,8 +114,8 @@ class ScopeDefinitionAdmin(admin.ModelAdmin):
     def is_active_badge(self, obj):
         """Display active status as badge."""
         if obj.is_active:
-            return format_html('<span style="color: green;">✓ Active</span>')
-        return format_html('<span style="color: red;">✗ Inactive</span>')
+            return mark_safe('<span style="color: green;">✓ Active</span>')
+        return mark_safe('<span style="color: red;">✗ Inactive</span>')
     is_active_badge.short_description = 'Status'
     
     def endpoint_count(self, obj):
@@ -192,8 +193,8 @@ class RoleDefinitionAdmin(admin.ModelAdmin):
     def is_active_badge(self, obj):
         """Display active status as badge."""
         if obj.is_active:
-            return format_html('<span style="color: green;">✓ Active</span>')
-        return format_html('<span style="color: red;">✗ Inactive</span>')
+            return mark_safe('<span style="color: green;">✓ Active</span>')
+        return mark_safe('<span style="color: red;">✗ Inactive</span>')
     is_active_badge.short_description = 'Status'
     
     def endpoint_count(self, obj):
@@ -443,8 +444,8 @@ class EndpointPermissionAdmin(URLPatternMixin, ScopeCountMixin, RoleCountMixin, 
     def is_active_badge(self, obj):
         """Display active status as badge."""
         if obj.is_active:
-            return format_html('<span style="color: green;">✓ Active</span>')
-        return format_html('<span style="color: red;">✗ Inactive</span>')
+            return mark_safe('<span style="color: green;">✓ Active</span>')
+        return mark_safe('<span style="color: red;">✗ Inactive</span>')
     is_active_badge.short_description = 'Status'
     
     def scope_count(self, obj):
@@ -654,8 +655,8 @@ if RLS_AVAILABLE:
         def is_active_badge(self, obj):
             """Display active status as badge."""
             if obj.is_active:
-                return format_html('<span style="color: green;">✓ Active</span>')
-            return format_html('<span style="color: red;">✗ Inactive</span>')
+                return mark_safe('<span style="color: green;">✓ Active</span>')
+            return mark_safe('<span style="color: red;">✗ Inactive</span>')
         is_active_badge.short_description = 'Status'
         
         def scope_count(self, obj):
@@ -857,9 +858,7 @@ if RLS_AVAILABLE:
             
             self.message_user(
                 request,
-                format_html('<br>'.join(status_messages))
-            )
-        
+            mark_safe('<br>'.join(status_messages))
         check_policy_status.short_description = "Check status of selected policies"
         
         def apply_all_table_policies(self, request, queryset):
@@ -975,7 +974,7 @@ if RLS_AVAILABLE:
                     '<span style="color: green;">✓ Enabled{}</span>',
                     force_text
                 )
-            return format_html('<span style="color: red;">✗ Disabled</span>')
+            return mark_safe('<span style="color: red;">✗ Disabled</span>')
         rls_status_badge.short_description = 'RLS Status'
         
         def policy_count(self, obj):
@@ -1499,9 +1498,7 @@ if RLS_AVAILABLE:
             
             self.message_user(
                 request,
-                format_html('<br>'.join(status_messages))
-            )
-        
+            mark_safe('<br>'.join(status_messages))
         check_table_status.short_description = "Check RLS status for selected tables"
 
 
@@ -1716,14 +1713,14 @@ if CONFIG_AVAILABLE:
             if obj.token_leeway > 0:
                 badges.append(f'<span style="background-color: #ffc107; color: black; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Leeway: {obj.token_leeway}s</span>')
             
-            return format_html(' '.join(badges)) if badges else '-'
+            return mark_safe(' '.join(badges)) if badges else '-'
         validate_settings.short_description = 'Validation'
         
         def is_active_badge(self, obj):
             """Display active status as badge."""
             if obj.is_active:
-                return format_html('<span style="color: green; font-weight: bold;">✓ Active</span>')
-            return format_html('<span style="color: #6c757d;">○ Inactive</span>')
+                return mark_safe('<span style="color: green; font-weight: bold;">✓ Active</span>')
+            return mark_safe('<span style="color: #6c757d;">○ Inactive</span>')
         is_active_badge.short_description = 'Status'
         
         def activate_configuration(self, request, queryset):

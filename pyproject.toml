@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hub-auth-client"
-version = "1.0.41"
+version = "1.0.45"
 description = "MSAL JWT validation library with Entra ID RBAC support"
 readme = "README_PACKAGE.md"
 requires-python = ">=3.8"
@@ -46,8 +46,9 @@ Documentation = "https://github.com/rparrish-5542/hub_auth/blob/main/README_PACK
 Repository = "https://github.com/rparrish-5542/hub_auth"
 Issues = "https://github.com/rparrish-5542/hub_auth/issues"
 
-[tool.setuptools]
-packages = ["hub_auth_client"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["hub_auth_client*"]
 
 [tool.black]
 line-length = 100
