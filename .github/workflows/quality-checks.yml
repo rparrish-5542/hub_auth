@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements.txt || pip install PyJWT cryptography requests Django djangorestframework msal
           pip install flake8 black isort pylint mypy bandit
 
       - name: Run Black (code formatting check)
@@ -78,7 +78,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements.txt || pip install PyJWT cryptography requests Django djangorestframework msal
           pip install bandit safety pip-audit
 
       - name: Run Bandit (security issues)

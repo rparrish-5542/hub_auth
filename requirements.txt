@@ -1,0 +1,9 @@
+# Runtime dependencies for hub-auth-client
+# These are the core dependencies needed to use the package
+
+PyJWT>=2.8.0
+cryptography>=41.0.0
+requests>=2.31.0
+Django>=4.2
+djangorestframework>=3.14.0
+msal>=1.20.0
