@@ -48,7 +48,7 @@ jobs:
           pytest --cov=hub_auth_client --cov-report=xml --cov-report=term --cov-report=html || echo "No tests found, skipping"
       
       - name: Upload coverage reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-reports
@@ -105,7 +105,7 @@ jobs:
         run: twine check dist/*
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: python-package-distributions
           path: dist/
