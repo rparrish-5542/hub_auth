@@ -2,9 +2,16 @@
 
 This document describes how to release a new version of `hub-auth-client` to PyPI.
 
-## Automated Release (Recommended)
+## 🚀 Automated Release with Quality Gates (Recommended)
 
-### Option 1: Using GitHub UI (Manual Trigger)
+The version bump workflow now includes integrated quality and security checks. All releases must pass:
+- ✅ Security scan (Bandit)
+- ✅ Code linting (Flake8)
+- ✅ Tests (Pytest)
+
+See [INTEGRATED_WORKFLOW.md](docs/INTEGRATED_WORKFLOW.md) for complete details.
+
+### Option 1: Using GitHub UI (One-Click Release)
 
 1. Go to [Actions → Version Bump](https://github.com/<your-org>/hub_auth/actions/workflows/version-bump.yml)
 2. Click "Run workflow"
@@ -15,11 +22,11 @@ This document describes how to release a new version of `hub-auth-client` to PyP
 4. Enter release description (optional)
 5. Click "Run workflow"
 
-This will:
-- ✅ Bump version in `setup.py` and `pyproject.toml`
-- ✅ Create a git tag (`v1.0.45`)
-- ✅ Create a GitHub Release
-- ✅ Trigger CI/CD to build and publish to PyPI
+**What happens:**
+- Quality checks run (security, linting, tests)
+- If all pass: Version bumped, tag created, release published
+- Tag push triggers automated PyPI publish (~5 min total)
+- If checks fail: Workflow stops, you fix issues and retry
 
 ### Option 2: Manual Git Tag
 
