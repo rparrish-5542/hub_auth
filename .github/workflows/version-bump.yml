@@ -71,11 +71,11 @@ jobs:
           
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
           
-          # Update pyproject.toml
-          sed -i "s/version = \"$CURRENT_VERSION\"/version = \"$NEW_VERSION\"/" pyproject.toml
+          # Update pyproject.toml (use | as delimiter to avoid quote conflicts)
+          sed -i "s|version = \"$CURRENT_VERSION\"|version = \"$NEW_VERSION\"|" pyproject.toml
           
           # Update setup.py
-          sed -i "s/version=\"$CURRENT_VERSION\"/version=\"$NEW_VERSION\"/" setup.py
+          sed -i "s|version=\"$CURRENT_VERSION\"|version=\"$NEW_VERSION\"|" setup.py
           
           echo "Bumped version from $CURRENT_VERSION to $NEW_VERSION"
 
