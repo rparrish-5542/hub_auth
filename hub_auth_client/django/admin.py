@@ -116,8 +116,7 @@ class ScopeDefinitionAdmin(admin.ModelAdmin):
     def is_active_badge(self, obj):
         """Display active status as badge."""
         if obj.is_active:
-            # nosec B308 - hardcoded HTML, no user input
-            return mark_safe('<span style="color: green;">✓ Active</span>')
+            return mark_safe('<span style="color: green;">✓ Active</span>')  # nosec B308 - hardcoded HTML, no user input
         return mark_safe('<span style="color: red;">✗ Inactive</span>')  # nosec B308 - hardcoded HTML, no user input
     is_active_badge.short_description = 'Status'
 
@@ -197,8 +196,7 @@ class RoleDefinitionAdmin(admin.ModelAdmin):
     def is_active_badge(self, obj):
         """Display active status as badge."""
         if obj.is_active:
-            # nosec B308 - hardcoded HTML, no user input
-            return mark_safe('<span style="color: green;">✓ Active</span>')
+            return mark_safe('<span style="color: green;">✓ Active</span>')  # nosec B308 - hardcoded HTML, no user input
         return mark_safe('<span style="color: red;">✗ Inactive</span>')  # nosec B308 - hardcoded HTML, no user input
     is_active_badge.short_description = 'Status'
 
@@ -462,8 +460,7 @@ class EndpointPermissionAdmin(URLPatternMixin, ScopeCountMixin, RoleCountMixin, 
     def is_active_badge(self, obj):
         """Display active status as badge."""
         if obj.is_active:
-            # nosec B308 - hardcoded HTML, no user input
-            return mark_safe('<span style="color: green;">✓ Active</span>')
+            return mark_safe('<span style="color: green;">✓ Active</span>')  # nosec B308 - hardcoded HTML, no user input
         return mark_safe('<span style="color: red;">✗ Inactive</span>')  # nosec B308 - hardcoded HTML, no user input
     is_active_badge.short_description = 'Status'
 
@@ -674,10 +671,8 @@ if RLS_AVAILABLE:
         def is_active_badge(self, obj):
             """Display active status as badge."""
             if obj.is_active:
-                # nosec B308 - hardcoded HTML, no user input
-                return mark_safe('<span style="color: green;">✓ Active</span>')
-            # nosec B308 - hardcoded HTML, no user input
-            return mark_safe('<span style="color: red;">✗ Inactive</span>')
+                return mark_safe('<span style="color: green;">✓ Active</span>')  # nosec B308 - hardcoded HTML, no user input
+            return mark_safe('<span style="color: red;">✗ Inactive</span>')  # nosec B308 - hardcoded HTML, no user input
         is_active_badge.short_description = 'Status'
 
         def scope_count(self, obj):
@@ -995,8 +990,7 @@ if RLS_AVAILABLE:
                     '<span style="color: green;">✓ Enabled{}</span>',
                     force_text
                 )
-            # nosec B308 - hardcoded HTML, no user input
-            return mark_safe('<span style="color: red;">✗ Disabled</span>')
+            return mark_safe('<span style="color: red;">✗ Disabled</span>')  # nosec B308 - hardcoded HTML, no user input
         rls_status_badge.short_description = 'RLS Status'
 
         def policy_count(self, obj):
@@ -1753,10 +1747,8 @@ if CONFIG_AVAILABLE:
         def is_active_badge(self, obj):
             """Display active status as badge."""
             if obj.is_active:
-                # nosec B308 - hardcoded HTML, no user input
-                return mark_safe('<span style="color: green; font-weight: bold;">✓ Active</span>')
-            # nosec B308 - hardcoded HTML, no user input
-            return mark_safe('<span style="color: #6c757d;">○ Inactive</span>')
+                return mark_safe('<span style="color: green; font-weight: bold;">✓ Active</span>')  # nosec B308 - hardcoded HTML, no user input
+            return mark_safe('<span style="color: #6c757d;">○ Inactive</span>')  # nosec B308 - hardcoded HTML, no user input
         is_active_badge.short_description = 'Status'
 
         def activate_configuration(self, request, queryset):
