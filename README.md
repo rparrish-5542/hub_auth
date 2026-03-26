@@ -1,3 +1,14 @@
+# hub-auth-client
+
+![Build and Publish](https://github.com/rparrish-5542/hub_auth/actions/workflows/publish-package.yml/badge.svg)
+[![Code Quality](https://github.com/rparrish-5542/hub_auth/actions/workflows/quality-checks.yml/badge.svg)](https://github.com/<your-org>/hub_auth/actions/workflows/quality-checks.yml)
+[![CodeQL](https://github.com/rparrish-5542/hub_auth/actions/workflows/codeql.yml/badge.svg)](https://github.com/<your-org>/hub_auth/actions/workflows/codeql.yml)
+[![PyPI version](https://badge.fury.io/py/hub-auth-client.svg)](https://badge.fury.io/py/hub-auth-client)
+[![Python Version](https://img.shields.io/pypi/pyversions/hub-auth-client.svg)](https://pypi.org/project/hub-auth-client/)
+
+MSAL JWT validation package with Entra ID RBAC for Django applications.
+
+[Installation](#installation) | [Documentation](docs/) | [Security](SECURITY.md) | [Contributing](#contributing)
 # Hub Auth - MSAL JWT Authentication Package
 
 This repository contains:
