@@ -14,10 +14,10 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/rparrish-5542/hub_auth",
     packages=find_packages(exclude=["tests", "tests.*", "hub_auth", "authentication", "services"]),
+    license_files=[],  # Prevent automatic License-File metadata generation
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
