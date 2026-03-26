@@ -858,7 +858,7 @@ if RLS_AVAILABLE:
             
             self.message_user(
                 request,
-                mark_safe('<br>'.join(status_messages))  # nosec B308 - Status messages are internally generated
+                mark_safe('<br>'.join(status_messages))  # nosec B308 B703 - Status messages are internally generated
             )
         check_policy_status.short_description = "Check status of selected policies"
         
@@ -1499,7 +1499,7 @@ if RLS_AVAILABLE:
             
             self.message_user(
                 request,
-                mark_safe('<br>'.join(status_messages))  # nosec B308 - Status messages are internally generated
+                mark_safe('<br>'.join(status_messages))  # nosec B308 B703 - Status messages are internally generated
             )
         check_table_status.short_description = "Check RLS status for selected tables"
 
@@ -1715,7 +1715,7 @@ if CONFIG_AVAILABLE:
             if obj.token_leeway > 0:
                 badges.append(f'<span style="background-color: #ffc107; color: black; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Leeway: {obj.token_leeway}s</span>')
             
-            return mark_safe(' '.join(badges)) if badges else '-'  # nosec B308 - Badges are internally generated
+            return mark_safe(' '.join(badges)) if badges else '-'  # nosec B308 B703 - Badges are internally generated
         validate_settings.short_description = 'Validation'
         
         def is_active_badge(self, obj):
