@@ -4,8 +4,8 @@ Migration to add Azure AD configuration models.
 This allows storing Azure AD credentials in database instead of environment variables.
 """
 
-from django.db import migrations, models
 import django.core.validators
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):

@@ -5,11 +5,11 @@ Provides middleware, decorators, and utilities for integrating MSAL token
 validation into Django REST Framework projects.
 """
 
-from .middleware import MSALAuthenticationMiddleware
-from .decorators import require_token, require_scopes, require_roles
 from .authentication import MSALAuthentication
-from .permissions import HasScopes, HasRoles, HasAnyScope, HasAnyRole, HasAllScopes, HasAllRoles
-from .dynamic_permissions import DynamicPermission, DynamicScopePermission, DynamicRolePermission
+from .decorators import require_roles, require_scopes, require_token
+from .dynamic_permissions import DynamicPermission, DynamicRolePermission, DynamicScopePermission
+from .middleware import MSALAuthenticationMiddleware
+from .permissions import HasAllRoles, HasAllScopes, HasAnyRole, HasAnyScope, HasRoles, HasScopes
 
 # RLS components (optional, require PostgreSQL)
 # Use lazy imports to avoid circular import issues
@@ -25,8 +25,10 @@ def _init_rls():
     if RLS_AVAILABLE is not False:  # Already initialized
         return
     try:
-        from .rls_models import RLSPolicy as _RLSPolicy, RLSTableConfig as _RLSTableConfig
-        from .rls_middleware import RLSMiddleware as _RLSMiddleware, RLSDebugMiddleware as _RLSDebugMiddleware
+        from .rls_middleware import RLSDebugMiddleware as _RLSDebugMiddleware
+        from .rls_middleware import RLSMiddleware as _RLSMiddleware
+        from .rls_models import RLSPolicy as _RLSPolicy
+        from .rls_models import RLSTableConfig as _RLSTableConfig
         RLSPolicy = _RLSPolicy
         RLSTableConfig = _RLSTableConfig
         RLSMiddleware = _RLSMiddleware
@@ -47,7 +49,8 @@ def _init_config():
     if CONFIG_AVAILABLE is not False:  # Already initialized
         return
     try:
-        from .config_models import AzureADConfiguration as _AzureADConfiguration, AzureADConfigurationHistory as _AzureADConfigurationHistory
+        from .config_models import AzureADConfiguration as _AzureADConfiguration
+        from .config_models import AzureADConfigurationHistory as _AzureADConfigurationHistory
         AzureADConfiguration = _AzureADConfiguration
         AzureADConfigurationHistory = _AzureADConfigurationHistory
         CONFIG_AVAILABLE = True
@@ -68,7 +71,8 @@ def _init_admin_sso():
         return
     try:
         from .admin_auth import MSALAdminBackend as _MSALAdminBackend
-        from .admin_views import MSALAdminLoginView as _MSALAdminLoginView, MSALAdminCallbackView as _MSALAdminCallbackView
+        from .admin_views import MSALAdminCallbackView as _MSALAdminCallbackView
+        from .admin_views import MSALAdminLoginView as _MSALAdminLoginView
         MSALAdminBackend = _MSALAdminBackend
         MSALAdminLoginView = _MSALAdminLoginView
         MSALAdminCallbackView = _MSALAdminCallbackView

@@ -7,7 +7,8 @@ Usage:
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from hub_auth_client.django.models import ScopeDefinition, RoleDefinition
+
+from hub_auth_client.django.models import RoleDefinition, ScopeDefinition
 
 
 class Command(BaseCommand):
@@ -36,23 +37,23 @@ class Command(BaseCommand):
                 ('User.Read', 'User', 'Read user profile information'),
                 ('User.Write', 'User', 'Update user profile'),
                 ('User.ReadAll', 'User', 'Read all users'),
-                
+
                 # Employee scopes
                 ('Employee.Read', 'Employee', 'Read employee information'),
                 ('Employee.Write', 'Employee', 'Create and update employees'),
                 ('Employee.Delete', 'Employee', 'Delete employees'),
                 ('Employee.ReadAll', 'Employee', 'Read all employees'),
-                
+
                 # Files scopes
                 ('Files.Read', 'Files', 'Read files'),
                 ('Files.Write', 'Files', 'Create and update files'),
                 ('Files.Delete', 'Files', 'Delete files'),
                 ('Files.Share', 'Files', 'Share files with others'),
-                
+
                 # Department scopes
                 ('Department.Read', 'Department', 'Read department information'),
                 ('Department.Write', 'Department', 'Manage departments'),
-                
+
                 # Admin scopes
                 ('Admin.Read', 'Admin', 'Read admin data'),
                 ('Admin.Write', 'Admin', 'Manage admin settings'),

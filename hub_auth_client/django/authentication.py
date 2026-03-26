@@ -11,11 +11,14 @@ Usage in settings.py:
 
 import logging
 from typing import Optional, Tuple
+
 from django.conf import settings
 from rest_framework import authentication
 from rest_framework.exceptions import AuthenticationFailed
-from ..validators.msal import MSALTokenValidator
+
 from ..validators.app import AppTokenValidator
+from ..validators.msal import MSALTokenValidator
+
 logger = logging.getLogger(__name__)
 
 
@@ -26,7 +29,7 @@ class MSALUser:
     This is used when you don't want to sync users to the database,
     but still need user info from the token.
     """
-    
+
     def __init__(self, claims: dict):
         self.claims = claims
         # Azure AD uses 'oid' for object ID, but 'sub' can also be used as fallback
@@ -42,28 +45,28 @@ class MSALUser:
         self.is_authenticated = True
         self.is_active = True
         self.is_anonymous = False
-        
+
         # Log claims for debugging (only in debug mode)
         if not self.object_id:
             logger.warning(f"No 'oid' or 'sub' found in token claims. Available keys: {list(claims.keys())}")
         else:
             logger.debug(f"MSALUser created with object_id: {self.object_id}")
-    
+
     def __str__(self):
         return self.username or self.object_id
-    
+
     def has_scope(self, scope: str) -> bool:
         """Check if user has a specific scope."""
         return scope in self.scopes
-    
+
     def has_role(self, role: str) -> bool:
         """Check if user has a specific role."""
         return role in self.roles
-    
+
     def has_any_scope(self, scopes: list) -> bool:
         """Check if user has any of the specified scopes."""
         return any(scope in self.scopes for scope in scopes)
-    
+
     def has_all_scopes(self, scopes: list) -> bool:
         """Check if user has all of the specified scopes."""
         return all(scope in self.scopes for scope in scopes)
@@ -79,15 +82,15 @@ class MSALAuthentication(authentication.BaseAuthentication):
         AZURE_AD_TENANT_ID = "your-tenant-id"
         AZURE_AD_CLIENT_ID = "your-client-id"
     """
-    
+
     def __init__(self):
         super().__init__()
-        
+
         # Try to get config from database first
         try:
             from .config_models import AzureADConfiguration
             db_config = AzureADConfiguration.get_active_config()
-            
+
             if db_config:
                 logger.info(f"Using Azure AD configuration '{db_config.name}' from database")
                 self.validator = db_config.create_validator()
@@ -96,17 +99,17 @@ class MSALAuthentication(authentication.BaseAuthentication):
                 return
         except Exception as e:
             logger.debug(f"Could not load config from database: {e}")
-        
+
         # Fallback to settings.py configuration
         tenant_id = getattr(settings, 'AZURE_AD_TENANT_ID', None)
         client_id = getattr(settings, 'AZURE_AD_CLIENT_ID', None)
-        
+
         if not tenant_id or not client_id:
             raise ValueError(
                 "Either configure Azure AD via Django admin (AzureADConfiguration model) "
                 "or set AZURE_AD_TENANT_ID and AZURE_AD_CLIENT_ID in Django settings"
             )
-        
+
         logger.info("Using Azure AD configuration from settings.py")
         self.validator = MSALTokenValidator(
             tenant_id=tenant_id,
@@ -138,7 +141,7 @@ class MSALAuthentication(authentication.BaseAuthentication):
             leeway=getattr(settings, 'APP_JWT_LEEWAY', 0),
             require_exp=getattr(settings, 'APP_JWT_REQUIRE_EXP', True),
         )
-    
+
     def authenticate(self, request) -> Optional[Tuple[MSALUser, dict]]:
         """
         Authenticate the request and return (user, auth) tuple.
@@ -159,13 +162,13 @@ class MSALAuthentication(authentication.BaseAuthentication):
                 if path.startswith(exempt_path):
                     logger.debug(f"Path {path} is exempt from authentication")
                     return None
-        
+
         # Get token from Authorization header
         auth_header = request.META.get('HTTP_AUTHORIZATION', '')
-        
+
         if not auth_header:
             return None
-        
+
         # Validate token
         is_valid, claims, error = self.validator.validate_token(auth_header)
         used_app_token = False
@@ -173,15 +176,15 @@ class MSALAuthentication(authentication.BaseAuthentication):
         if not is_valid and self.app_validator:
             is_valid, claims, error = self.app_validator.validate_token(auth_header)
             used_app_token = is_valid
-        
+
         if not is_valid:
             raise AuthenticationFailed(error or 'Invalid token')
-        
+
         # Create user object from claims
         user = MSALUser(claims) if not used_app_token else MSALUser(claims)
-        
+
         return (user, claims)
-    
+
     def authenticate_header(self, request) -> str:
         """Return the authentication header to use in 401 responses."""
         return 'Bearer realm="api"'

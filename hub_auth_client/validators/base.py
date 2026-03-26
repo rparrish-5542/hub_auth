@@ -1,9 +1,8 @@
-import time
 import logging
-from typing import Dict, Any, Optional, List, Tuple
+import time
+from typing import Any, Dict, List, Optional
 
-from hub_auth_client.utils.jwt_helpers import strip_bearer
-from hub_auth_client.utils.claims import validate_scopes, validate_roles
+from hub_auth_client.utils.claims import validate_roles, validate_scopes
 
 logger = logging.getLogger(__name__)
 

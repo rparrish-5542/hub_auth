@@ -11,10 +11,11 @@ Usage:
     python manage.py fetch_azure_roles --format=json
 """
 
-from django.core.management.base import BaseCommand
-from django.conf import settings
-import requests
 import json
+
+import requests
+from django.conf import settings
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
@@ -58,7 +59,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Get Azure AD configuration
         config = self.get_azure_config(options)
-        
+
         if not config:
             self.stderr.write(
                 self.style.ERROR(
@@ -69,20 +70,20 @@ class Command(BaseCommand):
                 )
             )
             return
-        
+
         # Fetch roles from Azure AD
         roles = self.fetch_roles_from_azure(config, options.get('include_microsoft', False))
-        
+
         if not roles:
             self.stdout.write(self.style.WARNING('No App Roles found in Azure AD App Registration.'))
             return
-        
+
         # Output roles
         if options['format'] == 'json':
             self.output_json(roles)
         else:
             self.output_table(roles)
-        
+
         # Import to database if requested
         if options['import_roles']:
             self.import_roles(roles)
@@ -92,7 +93,7 @@ class Command(BaseCommand):
         tenant_id = options.get('tenant_id')
         client_id = options.get('client_id')
         client_secret = options.get('client_secret')
-        
+
         # Try command line arguments first
         if tenant_id and client_id and client_secret:
             return {
@@ -100,7 +101,7 @@ class Command(BaseCommand):
                 'client_id': client_id,
                 'client_secret': client_secret
             }
-        
+
         # Try database configuration
         try:
             from hub_auth_client.django.config_models import AzureADConfiguration
@@ -111,9 +112,9 @@ class Command(BaseCommand):
                     'client_id': active_config.client_id,
                     'client_secret': active_config.client_secret
                 }
-        except:
+        except Exception:
             pass
-        
+
         # Try settings
         if hasattr(settings, 'AZURE_AD_TENANT_ID'):
             return {
@@ -121,7 +122,7 @@ class Command(BaseCommand):
                 'client_id': settings.AZURE_AD_CLIENT_ID,
                 'client_secret': getattr(settings, 'AZURE_AD_CLIENT_SECRET', None)
             }
-        
+
         return None
 
     def fetch_roles_from_azure(self, config, include_microsoft=False):
@@ -129,7 +130,7 @@ class Command(BaseCommand):
         tenant_id = config['tenant_id']
         client_id = config['client_id']
         client_secret = config['client_secret']
-        
+
         # Get access token for Microsoft Graph
         token_url = f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token"
         token_data = {
@@ -138,62 +139,62 @@ class Command(BaseCommand):
             'client_secret': client_secret,
             'scope': 'https://graph.microsoft.com/.default'
         }
-        
+
         try:
             self.stdout.write('Authenticating with Azure AD...')
             token_response = requests.post(token_url, data=token_data, timeout=30)
             token_response.raise_for_status()
             access_token = token_response.json()['access_token']
-            
+
             headers = {
                 'Authorization': f'Bearer {access_token}',
                 'Content-Type': 'application/json'
             }
-            
+
             roles = []
-            
+
             # Get application details from Microsoft Graph
             graph_url = f"https://graph.microsoft.com/v1.0/applications"
             params = {
                 '$filter': f"appId eq '{client_id}'"
             }
-            
+
             self.stdout.write('Fetching application details from Microsoft Graph...')
             app_response = requests.get(graph_url, headers=headers, params=params, timeout=30)
             app_response.raise_for_status()
-            
+
             app_data = app_response.json()
-            
+
             if not app_data.get('value'):
                 self.stderr.write(
                     self.style.ERROR(f'Application not found for Client ID: {client_id}')
                 )
                 return []
-            
+
             app = app_data['value'][0]
-            
+
             # Display app info
             self.stdout.write(self.style.SUCCESS(f"\n✓ Found Application:"))
             self.stdout.write(f"  Display Name: {app.get('displayName', 'N/A')}")
             self.stdout.write(f"  App ID: {app.get('appId', 'N/A')}")
             self.stdout.write(f"  Object ID: {app.get('id', 'N/A')}")
-            
+
             # Extract App Roles
             if 'appRoles' in app and app['appRoles']:
                 app_roles = app['appRoles']
                 self.stdout.write(self.style.SUCCESS(f"\n✓ Found {len(app_roles)} App Roles"))
-                
+
                 for role in app_roles:
                     if not role.get('isEnabled', True):
                         self.stdout.write(self.style.WARNING(f"  ⚠ Skipping disabled role: {role.get('value', 'N/A')}"))
                         continue
-                    
+
                     role_value = role.get('value', '')
                     if not role_value:
                         continue
-                    
+
                     self.stdout.write(f"  - {role_value}")
-                    
+
                     roles.append({
                         'name': role_value,
                         'description': role.get('description', role.get('displayName', '')),
@@ -213,15 +214,15 @@ class Command(BaseCommand):
                     "3. Click '+ Create app role'\n"
                     "4. Define role name, value, description, and who can be assigned\n"
                 ))
-            
+
             # Optionally fetch Microsoft Graph roles
             if include_microsoft:
                 self.stdout.write('\nFetching Microsoft Graph API roles...')
                 ms_roles = self.fetch_microsoft_graph_roles(headers)
                 roles.extend(ms_roles)
-            
+
             return roles
-            
+
         except requests.exceptions.RequestException as e:
             self.stderr.write(
                 self.style.ERROR(f'Error fetching roles from Azure AD: {e}')
@@ -232,7 +233,7 @@ class Command(BaseCommand):
                     self.stderr.write(
                         self.style.ERROR(f'Response: {json.dumps(error_data, indent=2)}')
                     )
-                except:
+                except Exception:
                     self.stderr.write(
                         self.style.ERROR(f'Response: {e.response.text}')
                     )
@@ -247,17 +248,17 @@ class Command(BaseCommand):
             params = {
                 '$filter': "appId eq '00000003-0000-0000-c000-000000000000'"  # Microsoft Graph
             }
-            
+
             response = requests.get(ms_graph_sp_url, headers=headers, params=params, timeout=30)
             response.raise_for_status()
-            
+
             data = response.json()
             if data.get('value'):
                 ms_graph = data['value'][0]
-                
+
                 if 'appRoles' in ms_graph:
                     self.stdout.write(self.style.SUCCESS(f"\n✓ Found {len(ms_graph['appRoles'])} Microsoft Graph roles"))
-                    
+
                     for role in ms_graph['appRoles']:
                         if role.get('isEnabled', True) and role.get('value'):
                             roles.append({
@@ -272,13 +273,13 @@ class Command(BaseCommand):
                             })
         except Exception as e:
             self.stdout.write(self.style.WARNING(f"Could not fetch Microsoft Graph roles: {e}"))
-        
+
         return roles
 
     def get_role_category(self, role):
         """Determine role category based on allowed member types."""
         member_types = role.get('allowedMemberTypes', [])
-        
+
         if 'User' in member_types and 'Application' in member_types:
             return 'user_and_application'
         elif 'User' in member_types:
@@ -293,39 +294,39 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f'\n{"="*80}'))
         self.stdout.write(self.style.SUCCESS(f'Found {len(roles)} App Roles'))
         self.stdout.write(self.style.SUCCESS(f'{"="*80}\n'))
-        
+
         # Header
         header = f"{'Role Name':<30} {'Category':<20} {'Source':<20} {'Enabled':<10}"
         self.stdout.write(self.style.HTTP_INFO(header))
         self.stdout.write(self.style.HTTP_INFO('─' * 80))
-        
+
         # Sort by source then name
         roles.sort(key=lambda x: (x.get('source', ''), x['name']))
-        
+
         # Rows
         for role in roles:
             name = role['name'][:28]
             category = role.get('category', 'N/A')[:18]
             source = role.get('source', 'N/A')[:18]
             enabled = '✓' if role.get('is_enabled', True) else '✗'
-            
+
             row = f"{name:<30} {category:<20} {source:<20} {enabled:<10}"
-            
+
             if role.get('is_enabled', True):
                 self.stdout.write(self.style.SUCCESS(row))
             else:
                 self.stdout.write(self.style.WARNING(row))
-            
+
             # Show description
             if role.get('description'):
                 desc = role['description'][:100]
                 self.stdout.write(f"  → {desc}")
-            
+
             # Show allowed member types
             if role.get('allowed_member_types'):
                 members = ', '.join(role['allowed_member_types'])
                 self.stdout.write(self.style.HTTP_INFO(f"  ↳ Assignable to: {members}"))
-        
+
         # Summary by category
         self.stdout.write('\n' + self.style.SUCCESS('─' * 80))
         self.stdout.write(self.style.SUCCESS('Summary:'))
@@ -333,10 +334,10 @@ class Command(BaseCommand):
         for role in roles:
             cat = role.get('category', 'unknown')
             categories[cat] = categories.get(cat, 0) + 1
-        
+
         for cat, count in sorted(categories.items()):
             self.stdout.write(f"  {cat}: {count}")
-        
+
         self.stdout.write(self.style.SUCCESS('─' * 80))
 
     def output_json(self, roles):
@@ -347,18 +348,18 @@ class Command(BaseCommand):
         """Import roles into RoleDefinition model."""
         try:
             from hub_auth_client.django.models import RoleDefinition
-            
+
             created_count = 0
             updated_count = 0
             skipped_count = 0
-            
+
             for role_data in roles:
                 name = role_data['name']
-                
+
                 if not name:
                     skipped_count += 1
                     continue
-                
+
                 # Check if role exists
                 role, created = RoleDefinition.objects.get_or_create(
                     name=name,
@@ -368,7 +369,7 @@ class Command(BaseCommand):
                         'is_active': role_data.get('is_enabled', True)
                     }
                 )
-                
+
                 if created:
                     created_count += 1
                     self.stdout.write(
@@ -380,11 +381,11 @@ class Command(BaseCommand):
                     if role.description != role_data.get('description', ''):
                         role.description = role_data.get('description', '')
                         changed = True
-                    
+
                     if role.category != role_data.get('category', 'custom'):
                         role.category = role_data.get('category', 'custom')
                         changed = True
-                    
+
                     if changed:
                         role.save()
                         updated_count += 1
@@ -393,7 +394,7 @@ class Command(BaseCommand):
                         )
                     else:
                         skipped_count += 1
-            
+
             # Summary
             self.stdout.write('\n' + self.style.SUCCESS('═' * 80))
             self.stdout.write(self.style.SUCCESS('Import Summary:'))
@@ -402,7 +403,7 @@ class Command(BaseCommand):
             self.stdout.write(f'  ↻ Updated: {updated_count}')
             self.stdout.write(f'  ─ Skipped: {skipped_count}')
             self.stdout.write(self.style.SUCCESS('═' * 80))
-            
+
         except ImportError:
             self.stderr.write(
                 self.style.ERROR(

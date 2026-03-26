@@ -9,10 +9,8 @@ from django.urls import path, reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
-from .admin_mixins import (ActiveBadgeMixin, RoleCountMixin, ScopeCountMixin,
-                           URLPatternMixin)
-from .models import (APIEndpointMapping, EndpointPermission, RoleDefinition,
-                     ScopeDefinition)
+from .admin_mixins import ActiveBadgeMixin, RoleCountMixin, ScopeCountMixin, URLPatternMixin
+from .models import APIEndpointMapping, EndpointPermission, RoleDefinition, ScopeDefinition
 
 # Import RLS models if available
 try:
@@ -23,8 +21,7 @@ except ImportError:
 
 # Import config models if available
 try:
-    from .config_models import (AzureADConfiguration,
-                                AzureADConfigurationHistory)
+    from .config_models import AzureADConfiguration, AzureADConfigurationHistory
     CONFIG_AVAILABLE = True
 except ImportError:
     CONFIG_AVAILABLE = False
@@ -116,8 +113,8 @@ class ScopeDefinitionAdmin(admin.ModelAdmin):
     def is_active_badge(self, obj):
         """Display active status as badge."""
         if obj.is_active:
-            return mark_safe('<span style="color: green;">✓ Active</span>')  # nosec B308 - hardcoded HTML, no user input
-        return mark_safe('<span style="color: red;">✗ Inactive</span>')  # nosec B308 - hardcoded HTML, no user input
+            return mark_safe('<span style="color: green;">✓ Active</span>')  # nosec B308 - hardcoded HTML, no user input  # noqa: E501
+        return mark_safe('<span style="color: red;">✗ Inactive</span>')  # nosec B308 - hardcoded HTML, no user input  # noqa: E501
     is_active_badge.short_description = 'Status'
 
     def endpoint_count(self, obj):
@@ -149,7 +146,7 @@ class ScopeDefinitionAdmin(admin.ModelAdmin):
             # Show success message
             self.message_user(
                 request,
-                f"Azure AD sync completed. Check output for details."
+                "Azure AD sync completed. Check output for details."
             )
 
             # Show detailed output if available
@@ -196,8 +193,8 @@ class RoleDefinitionAdmin(admin.ModelAdmin):
     def is_active_badge(self, obj):
         """Display active status as badge."""
         if obj.is_active:
-            return mark_safe('<span style="color: green;">✓ Active</span>')  # nosec B308 - hardcoded HTML, no user input
-        return mark_safe('<span style="color: red;">✗ Inactive</span>')  # nosec B308 - hardcoded HTML, no user input
+            return mark_safe('<span style="color: green;">✓ Active</span>')  # nosec B308 - hardcoded HTML, no user input  # noqa: E501
+        return mark_safe('<span style="color: red;">✗ Inactive</span>')  # nosec B308 - hardcoded HTML, no user input  # noqa: E501
     is_active_badge.short_description = 'Status'
 
     def endpoint_count(self, obj):
@@ -460,8 +457,8 @@ class EndpointPermissionAdmin(URLPatternMixin, ScopeCountMixin, RoleCountMixin, 
     def is_active_badge(self, obj):
         """Display active status as badge."""
         if obj.is_active:
-            return mark_safe('<span style="color: green;">✓ Active</span>')  # nosec B308 - hardcoded HTML, no user input
-        return mark_safe('<span style="color: red;">✗ Inactive</span>')  # nosec B308 - hardcoded HTML, no user input
+            return mark_safe('<span style="color: green;">✓ Active</span>')  # nosec B308 - hardcoded HTML, no user input  # noqa: E501
+        return mark_safe('<span style="color: red;">✗ Inactive</span>')  # nosec B308 - hardcoded HTML, no user input  # noqa: E501
     is_active_badge.short_description = 'Status'
 
     def scope_count(self, obj):
@@ -671,8 +668,8 @@ if RLS_AVAILABLE:
         def is_active_badge(self, obj):
             """Display active status as badge."""
             if obj.is_active:
-                return mark_safe('<span style="color: green;">✓ Active</span>')  # nosec B308 - hardcoded HTML, no user input
-            return mark_safe('<span style="color: red;">✗ Inactive</span>')  # nosec B308 - hardcoded HTML, no user input
+                return mark_safe('<span style="color: green;">✓ Active</span>')  # nosec B308 - hardcoded HTML, no user input  # noqa: E501
+            return mark_safe('<span style="color: red;">✗ Inactive</span>')  # nosec B308 - hardcoded HTML, no user input  # noqa: E501
         is_active_badge.short_description = 'Status'
 
         def scope_count(self, obj):
@@ -990,7 +987,7 @@ if RLS_AVAILABLE:
                     '<span style="color: green;">✓ Enabled{}</span>',
                     force_text
                 )
-            return mark_safe('<span style="color: red;">✗ Disabled</span>')  # nosec B308 - hardcoded HTML, no user input
+            return mark_safe('<span style="color: red;">✗ Disabled</span>')  # nosec B308 - hardcoded HTML, no user input  # noqa: E501
         rls_status_badge.short_description = 'RLS Status'
 
         def policy_count(self, obj):
@@ -1747,8 +1744,8 @@ if CONFIG_AVAILABLE:
         def is_active_badge(self, obj):
             """Display active status as badge."""
             if obj.is_active:
-                return mark_safe('<span style="color: green; font-weight: bold;">✓ Active</span>')  # nosec B308 - hardcoded HTML, no user input
-            return mark_safe('<span style="color: #6c757d;">○ Inactive</span>')  # nosec B308 - hardcoded HTML, no user input
+                return mark_safe('<span style="color: green; font-weight: bold;">✓ Active</span>')  # nosec B308 - hardcoded HTML, no user input  # noqa: E501
+            return mark_safe('<span style="color: #6c757d;">○ Inactive</span>')  # nosec B308 - hardcoded HTML, no user input  # noqa: E501
         is_active_badge.short_description = 'Status'
 
         def activate_configuration(self, request, queryset):
@@ -1778,7 +1775,7 @@ if CONFIG_AVAILABLE:
                 tenant_id=config.tenant_id,
                 client_id=config.client_id,
                 changed_by=request.user.username if request.user.is_authenticated else 'unknown',
-                details=f"Activated via admin action"
+                details="Activated via admin action"
             )
 
             self.message_user(
@@ -1849,7 +1846,7 @@ if CONFIG_AVAILABLE:
                 tenant_id=obj.tenant_id,
                 client_id=obj.client_id,
                 changed_by=request.user.username if request.user.is_authenticated else 'unknown',
-                details=f"Modified via admin interface"
+                details="Modified via admin interface"
             )
 
         class Media:
@@ -2107,7 +2104,7 @@ class APIEndpointMappingAdmin(admin.ModelAdmin):
                             })
                             order += 1
 
-            except Exception as e:
+            except Exception:
                 # Skip apps that can't be imported
                 continue
 
@@ -2116,7 +2113,6 @@ class APIEndpointMappingAdmin(admin.ModelAdmin):
     def _get_base_url_for_viewset(self, viewset_class, app_name):
         """Try to determine the base URL for a ViewSet by inspecting URLs."""
         import importlib
-
 
         try:
             # Try to import the app's urls module

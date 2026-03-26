@@ -2,11 +2,12 @@
 """
 Validator for application tokens using a shared secret.
 """
-import jwt
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Any, Dict, Optional, Tuple
 
-from hub_auth_client.validators.base import BaseTokenValidator
+import jwt
+
 from hub_auth_client.utils.jwt_helpers import strip_bearer
+from hub_auth_client.validators.base import BaseTokenValidator
 
 
 class AppTokenValidator(BaseTokenValidator):

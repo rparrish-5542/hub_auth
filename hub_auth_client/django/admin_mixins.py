@@ -3,21 +3,22 @@ Reusable admin mixins for common functionality.
 """
 
 from django.utils.html import format_html
+
 from .admin_helpers import (
     format_active_badge,
+    format_badge,
     format_count_with_requirement,
     format_masked_guid,
     format_sensitive_field_with_reveal,
-    format_validation_badges,
-    format_badge,
     format_sql_preview,
-    humanize_url_pattern
+    format_validation_badges,
+    humanize_url_pattern,
 )
 
 
 class ActiveBadgeMixin:
     """Mixin to add is_active_badge display method."""
-    
+
     def is_active_badge(self, obj):
         """Display active status as badge."""
         return format_active_badge(obj.is_active)
@@ -26,7 +27,7 @@ class ActiveBadgeMixin:
 
 class EndpointCountMixin:
     """Mixin to add endpoint_count display method."""
-    
+
     def endpoint_count(self, obj):
         """Count endpoints using this scope/role."""
         count = obj.endpoints.filter(is_active=True).count()
@@ -36,7 +37,7 @@ class EndpointCountMixin:
 
 class ScopeCountMixin:
     """Mixin to add scope_count display method."""
-    
+
     def scope_count(self, obj):
         """Count required scopes."""
         count = obj.required_scopes.filter(is_active=True).count()
@@ -47,7 +48,7 @@ class ScopeCountMixin:
 
 class RoleCountMixin:
     """Mixin to add role_count display method."""
-    
+
     def role_count(self, obj):
         """Count required roles."""
         count = obj.required_roles.filter(is_active=True).count()
@@ -58,12 +59,12 @@ class RoleCountMixin:
 
 class MaskedFieldMixin:
     """Mixin for Azure AD credential masking."""
-    
+
     def tenant_id_masked(self, obj):
         """Display masked tenant ID."""
         return format_masked_guid(obj.tenant_id)
     tenant_id_masked.short_description = 'Tenant ID'
-    
+
     def client_id_masked(self, obj):
         """Display masked client ID."""
         return format_masked_guid(obj.client_id)
@@ -72,7 +73,7 @@ class MaskedFieldMixin:
 
 class SensitiveFieldRevealMixin:
     """Mixin for revealing sensitive fields with eye button."""
-    
+
     def tenant_id_reveal(self, obj):
         """Display tenant ID with reveal button."""
         return format_sensitive_field_with_reveal(
@@ -81,7 +82,7 @@ class SensitiveFieldRevealMixin:
             obj.pk if obj else None
         )
     tenant_id_reveal.short_description = ''
-    
+
     def client_id_reveal(self, obj):
         """Display client ID with reveal button."""
         return format_sensitive_field_with_reveal(
@@ -90,7 +91,7 @@ class SensitiveFieldRevealMixin:
             obj.pk if obj else None
         )
     client_id_reveal.short_description = ''
-    
+
     def client_secret_reveal(self, obj):
         """Display client secret with reveal button."""
         return format_sensitive_field_with_reveal(
@@ -104,7 +105,7 @@ class SensitiveFieldRevealMixin:
 
 class AzureADConfigBadgeMixin:
     """Mixin for Azure AD configuration badges."""
-    
+
     def name_badge(self, obj):
         """Display name with active badge."""
         if obj.is_active:
@@ -115,7 +116,7 @@ class AzureADConfigBadgeMixin:
             )
         return format_html('<span>{}</span>', obj.name)
     name_badge.short_description = 'Name'
-    
+
     def validate_settings(self, obj):
         """Display validation settings as badges."""
         return format_validation_badges(
@@ -128,7 +129,7 @@ class AzureADConfigBadgeMixin:
 
 class RLSStatusMixin:
     """Mixin for RLS status display."""
-    
+
     def rls_status_badge(self, obj):
         """Display RLS status as badge."""
         if obj.rls_enabled:
@@ -139,7 +140,7 @@ class RLSStatusMixin:
             )
         return format_html('<span style="color: red;">✗ Disabled</span>')
     rls_status_badge.short_description = 'RLS Status'
-    
+
     def session_vars_summary(self, obj):
         """Summary of session variables configuration."""
         vars_enabled = []
@@ -151,14 +152,14 @@ class RLSStatusMixin:
             vars_enabled.append('roles')
         if obj.custom_session_vars:
             vars_enabled.append(f"{len(obj.custom_session_vars)} custom")
-        
+
         return ', '.join(vars_enabled) if vars_enabled else 'None'
     session_vars_summary.short_description = 'Session Variables'
 
 
 class SQLPreviewMixin:
     """Mixin for SQL preview display."""
-    
+
     def preview_sql(self, obj):
         """Preview the generated SQL for this policy."""
         if obj.pk:
@@ -170,14 +171,14 @@ class SQLPreviewMixin:
 
 class URLPatternMixin:
     """Mixin for displaying URL patterns with human-readable descriptions."""
-    
+
     def url_pattern_display(self, obj):
         """Display URL pattern with human-readable description."""
         if not obj.url_pattern:
             return '-'
-        
+
         readable = humanize_url_pattern(obj.url_pattern)
-        
+
         return format_html(
             '<div title="Regex: {}">'
             '<strong>{}</strong><br>'
@@ -188,7 +189,7 @@ class URLPatternMixin:
             readable
         )
     url_pattern_display.short_description = 'URL Pattern'
-    
+
     def url_pattern_readable(self, obj):
         """Display only the human-readable URL pattern."""
         if not obj.url_pattern:

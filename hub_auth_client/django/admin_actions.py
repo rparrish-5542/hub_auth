@@ -5,8 +5,7 @@ Reusable admin actions for RLS and permission management.
 from django.contrib import messages
 from django.db import connection
 
-from .admin_helpers import (execute_sql_safely, get_database_tables,
-                            is_postgresql_database)
+from .admin_helpers import execute_sql_safely, get_database_tables, is_postgresql_database
 
 
 def discover_tables_action(modeladmin, request, queryset, table_config_model):
@@ -115,7 +114,7 @@ def apply_policies_action(modeladmin, request, queryset):
     applied_count = 0
     errors = []
 
-    with connection.cursor() as cursor:
+    with connection.cursor():
         for policy in queryset:
             if not policy.is_active:
                 continue
@@ -340,7 +339,7 @@ def activate_configuration_action(modeladmin, request, queryset, config_model, h
         tenant_id=config.tenant_id,
         client_id=config.client_id,
         changed_by=request.user.username if request.user.is_authenticated else 'unknown',
-        details=f"Activated via admin action"
+        details="Activated via admin action"
     )
 
     modeladmin.message_user(

@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 
 def extract_scopes(decoded_token: Dict[str, Any]) -> List[str]:

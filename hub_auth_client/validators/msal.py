@@ -2,14 +2,15 @@
 """
 Validator for MSAL JWT tokens.
 """
-import time
-import jwt
 import logging
-from typing import Dict, Any, Optional, List, Tuple
+import time
+from typing import Any, Dict, List, Optional, Tuple
+
+import jwt
 from jwt import PyJWKClient
 
+from hub_auth_client.utils.jwt_helpers import decode_unverified, get_kid, strip_bearer
 from hub_auth_client.validators.base import BaseTokenValidator
-from hub_auth_client.utils.jwt_helpers import strip_bearer, decode_unverified, get_kid
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +48,7 @@ class MSALTokenValidator(BaseTokenValidator):
         token = strip_bearer(token)
 
         try:
-            unverified = decode_unverified(token)
+            decode_unverified(token)
             signing_key = self.jwks_client.get_signing_key(get_kid(token))
 
             decoded = jwt.decode(

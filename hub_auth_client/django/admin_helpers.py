@@ -3,8 +3,9 @@ Helper functions and utilities for Django admin customization.
 """
 
 import re
-from django.utils.html import format_html
+
 from django.db import connection
+from django.utils.html import format_html
 
 
 def format_active_badge(is_active):
@@ -23,34 +24,33 @@ def format_active_badge(is_active):
 
 
 def humanize_url_pattern(pattern):
-    """
+    r"""
     Convert a regex URL pattern to a human-readable description.
-    
+
     Args:
         pattern (str): The regex URL pattern
-        
+
     Returns:
         str: Human-readable description
-        
+
     Examples:
         '^api/employees/$' -> '/api/employees/ (exact match)'
         'admin/(?P<url>.*)$' -> '/admin/{url} (any path)'
         '^api/employees/(?P<pk>[^/.]+)/$' -> '/api/employees/{pk}/'
         '^api/employees\.(?P<format>[a-z0-9]+)/?$' -> '/api/employees.{format} (optional trailing slash)'
-    """
     if not pattern:
         return ''
-    
+
     # Make a copy to modify
     readable = pattern
-    
+
     # Remove common regex anchors
     readable = readable.replace('^', '')
     readable = readable.replace('$', '')
-    
+
     # Track what we removed for description
     descriptions = []
-    
+
     # Handle named groups like (?P<name>pattern)
     named_groups = re.findall(r'\(\?P<(\w+)>([^)]+)\)', readable)
     for name, regex_pattern in named_groups:
@@ -65,32 +65,32 @@ def humanize_url_pattern(pattern):
             replacement = f'{{{name}:number}}'
         else:
             replacement = f'{{{name}}}'
-        
+
         readable = re.sub(r'\(\?P<' + name + r'>[^)]+\)', replacement, readable)
-    
+
     # Handle optional trailing slash
     if readable.endswith('/?'):
         readable = readable[:-2]
         descriptions.append('optional trailing slash')
-    
+
     # Handle wildcard patterns
     if '.*' in readable:
         readable = readable.replace('.*', '*')
         if 'any path' not in descriptions:
             descriptions.append('any path')
-    
+
     # Clean up escaping
     readable = readable.replace(r'\.', '.')
     readable = readable.replace(r'\-', '-')
-    
+
     # Add leading slash if not present
     if not readable.startswith('/'):
         readable = '/' + readable
-    
+
     # Build final description
     if descriptions:
         return f"{readable} ({', '.join(descriptions)})"
-    
+
     return readable
 
 
@@ -107,7 +107,7 @@ def format_masked_guid(value, visible_chars=12):
     """
     if not value:
         return '-'
-    
+
     return format_html(
         '<span class="masked-field">••••••••-••••-••••-••••-{}</span>',
         value[-visible_chars:]
@@ -129,7 +129,7 @@ def format_sensitive_field_with_reveal(value, field_id, obj_pk, visible_chars=12
     """
     if not value or not obj_pk:
         return format_html('<span style="color: #999;">Will be set after saving</span>')
-    
+
     # For GUIDs, show last portion
     if '-' in value and len(value) == 36:
         masked_value = f'••••••••-••••-••••-••••-{value[-visible_chars:]}'
@@ -137,15 +137,15 @@ def format_sensitive_field_with_reveal(value, field_id, obj_pk, visible_chars=12
         # For other values (like secrets), show dots
         masked_length = min(len(value), 40)
         masked_value = '•' * masked_length
-    
+
     return format_html(
-        '<div class="sensitive-field-wrapper">' 
-        '<span class="sensitive-field masked" data-value="{}" id="{}_{}">' 
-        '{}</span>' 
+        '<div class="sensitive-field-wrapper">'
+        '<span class="sensitive-field masked" data-value="{}" id="{}_{}">'
+        '{}</span>'
         '<button type="button" class="reveal-btn" data-field-id="{}_{}" '
-        'title="Click to reveal">' 
-        '<span class="eye-icon">👁</span>' 
-        '</button>' 
+        'title="Click to reveal">'
+        '<span class="eye-icon">👁</span>'
+        '</button>'
         '</div>',
         value,
         field_id,
@@ -211,7 +211,7 @@ def format_validation_badges(validate_audience=False, validate_issuer=False, tok
         badges.append('<span style="background-color: #17a2b8; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">ISS</span>')
     if token_leeway > 0:
         badges.append(f'<span style="background-color: #ffc107; color: black; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Leeway: {token_leeway}s</span>')
-    
+
     return format_html(' '.join(badges)) if badges else '-'
 
 
@@ -267,7 +267,7 @@ def get_database_tables(exclude_system_tables=True):
     """
     if not is_postgresql_database():
         raise RuntimeError("This operation requires a PostgreSQL database.")
-    
+
     with connection.cursor() as cursor:
         if exclude_system_tables:
             cursor.execute("""
@@ -293,7 +293,7 @@ def get_database_tables(exclude_system_tables=True):
                 LEFT JOIN pg_class ON pg_class.relname = pg_tables.tablename
                 ORDER BY schemaname, tablename
             """)
-        
+
         return cursor.fetchall()
 
 
@@ -310,7 +310,7 @@ def check_policy_exists(table_name, policy_name):
     """
     if not is_postgresql_database():
         return False
-    
+
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT EXISTS (
@@ -318,7 +318,7 @@ def check_policy_exists(table_name, policy_name):
                 WHERE tablename = %s AND policyname = %s
             )
         """, [table_name, policy_name])
-        
+
         return cursor.fetchone()[0]
 
 
@@ -334,14 +334,14 @@ def get_table_rls_status(table_name):
     """
     if not is_postgresql_database():
         return None
-    
+
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT relrowsecurity, relforcerowsecurity
             FROM pg_class
             WHERE relname = %s
         """, [table_name])
-        
+
         return cursor.fetchone()
 
 
@@ -357,13 +357,13 @@ def get_policy_count(table_name):
     """
     if not is_postgresql_database():
         return 0
-    
+
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT COUNT(*) FROM pg_policies
             WHERE tablename = %s
         """, [table_name])
-        
+
         return cursor.fetchone()[0]
 
 

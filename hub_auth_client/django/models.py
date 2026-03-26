@@ -5,7 +5,6 @@ This allows configuring required scopes/roles per endpoint without hardcoding th
 """
 
 from django.db import models
-from django.core.validators import RegexValidator
 
 
 class ScopeDefinition(models.Model):
@@ -14,7 +13,7 @@ class ScopeDefinition(models.Model):
     
     These should match the scopes configured in Azure AD.
     """
-    
+
     name = models.CharField(
         max_length=100,
         unique=True,
@@ -35,12 +34,12 @@ class ScopeDefinition(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         verbose_name = "Scope Definition"
         verbose_name_plural = "Scope Definitions"
         ordering = ['category', 'name']
-    
+
     def __str__(self):
         return f"{self.name}" + (f" ({self.category})" if self.category else "")
 
@@ -51,7 +50,7 @@ class RoleDefinition(models.Model):
     
     These should match the app roles configured in Azure AD.
     """
-    
+
     name = models.CharField(
         max_length=100,
         unique=True,
@@ -67,12 +66,12 @@ class RoleDefinition(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         verbose_name = "Role Definition"
         verbose_name_plural = "Role Definitions"
         ordering = ['name']
-    
+
     def __str__(self):
         return self.name
 
@@ -83,12 +82,12 @@ class EndpointPermission(models.Model):
     
     Maps URL patterns to required scopes and roles.
     """
-    
+
     REQUIRE_CHOICES = [
         ('any', 'Any (at least one)'),
         ('all', 'All (must have all)'),
     ]
-    
+
     name = models.CharField(
         max_length=200,
         unique=True,
@@ -103,7 +102,7 @@ class EndpointPermission(models.Model):
         default='GET,POST,PUT,PATCH,DELETE',
         help_text="Comma-separated HTTP methods (e.g., 'GET,POST'). Use '*' for all."
     )
-    
+
     # Scope requirements
     required_scopes = models.ManyToManyField(
         ScopeDefinition,
@@ -117,7 +116,7 @@ class EndpointPermission(models.Model):
         default='any',
         help_text="Whether user needs ANY or ALL of the required scopes"
     )
-    
+
     # Role requirements
     required_roles = models.ManyToManyField(
         RoleDefinition,
@@ -131,7 +130,7 @@ class EndpointPermission(models.Model):
         default='any',
         help_text="Whether user needs ANY or ALL of the required roles"
     )
-    
+
     # Settings
     is_active = models.BooleanField(
         default=True,
@@ -141,7 +140,7 @@ class EndpointPermission(models.Model):
         default=0,
         help_text="Priority for matching (higher = checked first)"
     )
-    
+
     # Metadata
     description = models.TextField(
         blank=True,
@@ -149,7 +148,7 @@ class EndpointPermission(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         verbose_name = "Endpoint Permission"
         verbose_name_plural = "Endpoint Permissions"
@@ -158,38 +157,38 @@ class EndpointPermission(models.Model):
             models.Index(fields=['url_pattern', 'is_active']),
             models.Index(fields=['-priority']),
         ]
-    
+
     def __str__(self):
         return f"{self.name} ({self.url_pattern})"
-    
+
     def get_http_methods(self):
         """Get list of HTTP methods."""
         if self.http_methods == '*':
             return ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']
         return [m.strip().upper() for m in self.http_methods.split(',')]
-    
+
     def matches_request(self, path, method):
         """Check if this permission rule matches the request."""
         import re
-        
+
         if not self.is_active:
             return False
-        
+
         # Check HTTP method
         if method.upper() not in self.get_http_methods():
             return False
-        
+
         # Check URL pattern
         try:
             pattern = re.compile(self.url_pattern)
             return pattern.match(path) is not None
         except re.error:
             return False
-    
+
     def get_required_scope_names(self):
         """Get list of required scope names."""
         return list(self.required_scopes.filter(is_active=True).values_list('name', flat=True))
-    
+
     def get_required_role_names(self):
         """Get list of required role names."""
         return list(self.required_roles.filter(is_active=True).values_list('name', flat=True))
@@ -202,7 +201,7 @@ class APIEndpointMapping(models.Model):
     This model doesn't have a database table - it's used to dynamically
     discover ViewSets and their serializers from the installed Django app.
     """
-    
+
     class Meta:
         managed = False  # This is a virtual model, no database table
         verbose_name = 'API Endpoint Mapping'

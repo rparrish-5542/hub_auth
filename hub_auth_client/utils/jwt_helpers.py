@@ -2,8 +2,9 @@
 """
 JWT helper functions for token processing.
 """
+from typing import Any, Dict
+
 import jwt
-from typing import Dict, Any
 
 
 def strip_bearer(token: str) -> str:

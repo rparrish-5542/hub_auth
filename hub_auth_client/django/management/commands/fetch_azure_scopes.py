@@ -8,10 +8,11 @@ Usage:
     python manage.py fetch_azure_scopes --format=json
 """
 
-from django.core.management.base import BaseCommand
-from django.conf import settings
-import requests
 import json
+
+import requests
+from django.conf import settings
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
@@ -50,7 +51,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Get Azure AD configuration
         config = self.get_azure_config(options)
-        
+
         if not config:
             self.stderr.write(
                 self.style.ERROR(
@@ -61,20 +62,20 @@ class Command(BaseCommand):
                 )
             )
             return
-        
+
         # Fetch scopes from Azure AD
         scopes = self.fetch_scopes_from_azure(config)
-        
+
         if not scopes:
             self.stdout.write(self.style.WARNING('No scopes found in Azure AD App Registration.'))
             return
-        
+
         # Output scopes
         if options['format'] == 'json':
             self.output_json(scopes)
         else:
             self.output_table(scopes)
-        
+
         # Import to database if requested
         if options['import_scopes']:
             self.import_scopes(scopes)
@@ -84,7 +85,7 @@ class Command(BaseCommand):
         tenant_id = options.get('tenant_id')
         client_id = options.get('client_id')
         client_secret = options.get('client_secret')
-        
+
         # Try command line arguments first
         if tenant_id and client_id and client_secret:
             return {
@@ -92,7 +93,7 @@ class Command(BaseCommand):
                 'client_id': client_id,
                 'client_secret': client_secret
             }
-        
+
         # Try database configuration
         try:
             from hub_auth_client.django.config_models import AzureADConfiguration
@@ -103,9 +104,9 @@ class Command(BaseCommand):
                     'client_id': active_config.client_id,
                     'client_secret': active_config.client_secret
                 }
-        except:
+        except Exception:
             pass
-        
+
         # Try settings
         if hasattr(settings, 'AZURE_AD_TENANT_ID'):
             return {
@@ -113,7 +114,7 @@ class Command(BaseCommand):
                 'client_id': settings.AZURE_AD_CLIENT_ID,
                 'client_secret': getattr(settings, 'AZURE_AD_CLIENT_SECRET', None)
             }
-        
+
         return None
 
     def fetch_scopes_from_azure(self, config):
@@ -121,7 +122,7 @@ class Command(BaseCommand):
         tenant_id = config['tenant_id']
         client_id = config['client_id']
         client_secret = config['client_secret']
-        
+
         # Get access token for Microsoft Graph
         token_url = f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token"
         token_data = {
@@ -130,77 +131,77 @@ class Command(BaseCommand):
             'client_secret': client_secret,
             'scope': 'https://graph.microsoft.com/.default'
         }
-        
+
         try:
             self.stdout.write('Authenticating with Azure AD...')
             token_response = requests.post(token_url, data=token_data, timeout=30)
             token_response.raise_for_status()
             access_token = token_response.json()['access_token']
-            
+
             # Get application details from Microsoft Graph
             graph_url = f"https://graph.microsoft.com/v1.0/applications"
             headers = {
                 'Authorization': f'Bearer {access_token}',
                 'Content-Type': 'application/json'
             }
-            
+
             # Filter by client ID
             params = {
                 '$filter': f"appId eq '{client_id}'"
             }
-            
+
             self.stdout.write('Fetching application details from Microsoft Graph...')
             app_response = requests.get(graph_url, headers=headers, params=params, timeout=30)
             app_response.raise_for_status()
-            
+
             app_data = app_response.json()
-            
+
             if not app_data.get('value'):
                 self.stderr.write(
                     self.style.ERROR(f'Application not found for Client ID: {client_id}')
                 )
                 return []
-            
+
             app = app_data['value'][0]
-            
+
             # Debug: Show what we found
             self.stdout.write(f"Application ID: {app.get('id', 'N/A')}")
             self.stdout.write(f"Display Name: {app.get('displayName', 'N/A')}")
             self.stdout.write(f"App ID: {app.get('appId', 'N/A')}")
-            
+
             # Debug: Show full app structure keys
             self.stdout.write(self.style.WARNING(f"DEBUG: Top-level app keys: {list(app.keys())}"))
-            
+
             # Get identifier URIs
             identifier_uris = app.get('identifierUris', [])
             if identifier_uris:
                 self.stdout.write(f"Identifier URIs: {', '.join(identifier_uris)}")
             else:
                 self.stdout.write(self.style.WARNING("No identifier URIs found"))
-            
+
             # Extract scopes from API permissions
             scopes = []
-            
+
             # OAuth2 Permission Scopes (delegated permissions) - This is where exposed API scopes are
             if 'api' in app:
                 self.stdout.write(self.style.SUCCESS(f"✓ Found 'api' key in app object"))
                 self.stdout.write(self.style.WARNING(f"DEBUG: app['api'] keys: {list(app['api'].keys())}"))
-                
+
                 if 'oauth2PermissionScopes' in app['api']:
                     oauth_scopes = app['api']['oauth2PermissionScopes']
                     self.stdout.write(self.style.SUCCESS(f"✓ Found {len(oauth_scopes)} OAuth2 permission scopes"))
-                    
+
                     for scope in oauth_scopes:
                         scope_value = scope.get('value', '')
-                        
+
                         # Build full scope name with identifier URI if available
                         full_scope_name = scope_value
                         if identifier_uris and scope_value:
                             # Use first identifier URI as base
                             full_scope_name = f"{identifier_uris[0]}/{scope_value}"
-                        
+
                         self.stdout.write(f"  - {full_scope_name} (enabled: {scope.get('isEnabled', True)})")
-                        
+
                         scopes.append({
                             'name': full_scope_name,
                             'short_name': scope_value,
@@ -218,7 +219,7 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR("✗ No 'api' key found in app object"))
                 self.stdout.write(self.style.WARNING(f"DEBUG: Available top-level keys: {list(app.keys())}"))
                 self.stdout.write(self.style.WARNING(f"DEBUG: Keys containing 'api', 'scope', or 'permission': {[k for k in app.keys() if 'api' in k.lower() or 'scope' in k.lower() or 'permission' in k.lower()]}"))
-                
+
                 # Try alternative: use beta endpoint which has more details
                 self.stdout.write(self.style.WARNING("\nTrying Microsoft Graph beta endpoint for more details..."))
                 try:
@@ -226,27 +227,27 @@ class Command(BaseCommand):
                     beta_response = requests.get(beta_url, headers=headers, timeout=30)
                     beta_response.raise_for_status()
                     beta_app = beta_response.json()
-                    
+
                     self.stdout.write(self.style.WARNING(f"DEBUG: Beta endpoint keys: {list(beta_app.keys())}"))
-                    
+
                     if 'api' in beta_app:
                         self.stdout.write(self.style.SUCCESS("✓ Found 'api' key in beta endpoint"))
                         self.stdout.write(self.style.WARNING(f"DEBUG: beta_app['api'] keys: {list(beta_app['api'].keys())}"))
-                        
+
                         if 'oauth2PermissionScopes' in beta_app['api']:
                             oauth_scopes = beta_app['api']['oauth2PermissionScopes']
                             self.stdout.write(self.style.SUCCESS(f"✓ Found {len(oauth_scopes)} OAuth2 permission scopes in beta endpoint"))
-                            
+
                             for scope in oauth_scopes:
                                 scope_value = scope.get('value', '')
-                                
+
                                 # Build full scope name with identifier URI if available
                                 full_scope_name = scope_value
                                 if identifier_uris and scope_value:
                                     full_scope_name = f"{identifier_uris[0]}/{scope_value}"
-                                
+
                                 self.stdout.write(f"  - {full_scope_name} (enabled: {scope.get('isEnabled', True)})")
-                                
+
                                 scopes.append({
                                     'name': full_scope_name,
                                     'short_name': scope_value,
@@ -269,7 +270,6 @@ class Command(BaseCommand):
                 except Exception as beta_error:
                     self.stdout.write(self.style.ERROR(f"Error trying beta endpoint: {beta_error}"))
 
-            
             # App Roles (application permissions)
             if 'appRoles' in app:
                 for role in app['appRoles']:
@@ -283,7 +283,7 @@ class Command(BaseCommand):
                             'allowed_member_types': role.get('allowedMemberTypes', []),
                             'id': role.get('id', '')
                         })
-            
+
             # Required Resource Access (API permissions)
             if 'requiredResourceAccess' in app:
                 for resource in app['requiredResourceAccess']:
@@ -298,9 +298,9 @@ class Command(BaseCommand):
                             'resource_app_id': resource_id,
                             'id': access.get('id', '')
                         })
-            
+
             return scopes
-            
+
         except requests.exceptions.RequestException as e:
             self.stderr.write(
                 self.style.ERROR(f'Error fetching scopes from Azure AD: {e}')
@@ -311,7 +311,7 @@ class Command(BaseCommand):
                     self.stderr.write(
                         self.style.ERROR(f'Response: {json.dumps(error_data, indent=2)}')
                     )
-                except:
+                except Exception:
                     self.stderr.write(
                         self.style.ERROR(f'Response: {e.response.text}')
                     )
@@ -320,36 +320,36 @@ class Command(BaseCommand):
     def output_table(self, scopes):
         """Output scopes as a formatted table."""
         self.stdout.write(self.style.SUCCESS(f'\nFound {len(scopes)} scopes in Azure AD:\n'))
-        
+
         # Header
         header = f"{'Scope Name':<40} {'Category':<15} {'Type':<15} {'Enabled':<10}"
         self.stdout.write(self.style.HTTP_INFO(header))
         self.stdout.write(self.style.HTTP_INFO('-' * len(header)))
-        
+
         # Sort by category then name
         scopes.sort(key=lambda x: (x['category'], x['name']))
-        
+
         # Rows
         for scope in scopes:
             name = scope['name'][:38]
             category = scope['category'][:13]
             scope_type = scope['type'][:13]
             enabled = '✓' if scope['enabled'] else '✗'
-            
+
             row = f"{name:<40} {category:<15} {scope_type:<15} {enabled:<10}"
             self.stdout.write(row)
-            
+
             # Show description
             if scope['description']:
                 self.stdout.write(f"  → {scope['description'][:100]}")
-        
+
         # Summary by category
         self.stdout.write('\n' + self.style.SUCCESS('Summary:'))
         categories = {}
         for scope in scopes:
             cat = scope['category']
             categories[cat] = categories.get(cat, 0) + 1
-        
+
         for cat, count in categories.items():
             self.stdout.write(f"  {cat}: {count}")
 
@@ -361,18 +361,18 @@ class Command(BaseCommand):
         """Import scopes into ScopeDefinition model."""
         try:
             from hub_auth_client.django.models import ScopeDefinition
-            
+
             created_count = 0
             updated_count = 0
             skipped_count = 0
-            
+
             for scope_data in scopes:
                 name = scope_data['name']
-                
+
                 if not name:
                     skipped_count += 1
                     continue
-                
+
                 # Check if scope exists
                 scope, created = ScopeDefinition.objects.get_or_create(
                     name=name,
@@ -382,7 +382,7 @@ class Command(BaseCommand):
                         'is_active': scope_data.get('enabled', True)
                     }
                 )
-                
+
                 if created:
                     created_count += 1
                     self.stdout.write(
@@ -399,13 +399,13 @@ class Command(BaseCommand):
                         )
                     else:
                         skipped_count += 1
-            
+
             # Summary
             self.stdout.write('\n' + self.style.SUCCESS('Import Summary:'))
             self.stdout.write(f'  Created: {created_count}')
             self.stdout.write(f'  Updated: {updated_count}')
             self.stdout.write(f'  Skipped: {skipped_count}')
-            
+
         except ImportError:
             self.stderr.write(
                 self.style.ERROR(
