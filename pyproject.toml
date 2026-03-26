@@ -9,6 +9,7 @@ description = "MSAL JWT validation library with Entra ID RBAC support"
 readme = "README_PACKAGE.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
+license-files = ["LICENSE"]
 authors = [
     {name = "Ryan Parrish", email = "rparrish@wedgwood.org"}
 ]
