@@ -20,10 +20,10 @@ logger = logging.getLogger(__name__)
 class MSALAdminLoginView(View):
     """
     Initiates MSAL OAuth2 login flow for Django admin.
-    
+
     Usage in urls.py:
         from hub_auth_client.django.admin_views import MSALAdminLoginView, MSALAdminCallbackView
-        
+
         urlpatterns = [
             path('admin/login/msal/', MSALAdminLoginView.as_view(), name='msal_admin_login'),
             path('admin/login/msal/callback/', MSALAdminCallbackView.as_view(), name='msal_admin_callback'),
@@ -103,7 +103,7 @@ class MSALAdminLoginView(View):
 class MSALAdminCallbackView(View):
     """
     Handles OAuth2 callback from Microsoft.
-    
+
     Exchanges authorization code for access token and logs user in.
     """
 
@@ -183,11 +183,11 @@ class MSALAdminCallbackView(View):
     def _exchange_code_for_token(self, request, code):
         """
         Exchange authorization code for access token.
-        
+
         Args:
             request: Django request object
             code: Authorization code
-        
+
         Returns:
             dict: Token data or None if failed
         """
@@ -233,10 +233,10 @@ class MSALAdminCallbackView(View):
     def _validate_id_token(self, id_token):
         """
         Validate ID token and return claims.
-        
+
         Args:
             id_token: JWT ID token
-        
+
         Returns:
             dict: Token claims or None if invalid
         """

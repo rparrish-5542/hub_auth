@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 class MSALUser:
     """
     Lightweight user object for MSAL-authenticated requests.
-    
+
     This is used when you don't want to sync users to the database,
     but still need user info from the token.
     """
@@ -75,9 +75,9 @@ class MSALUser:
 class MSALAuthentication(authentication.BaseAuthentication):
     """
     DRF authentication backend that validates MSAL JWT tokens.
-    
+
     Returns an MSALUser object with claims from the token.
-    
+
     Configuration in settings.py:
         AZURE_AD_TENANT_ID = "your-tenant-id"
         AZURE_AD_CLIENT_ID = "your-client-id"
@@ -145,13 +145,13 @@ class MSALAuthentication(authentication.BaseAuthentication):
     def authenticate(self, request) -> Optional[Tuple[MSALUser, dict]]:
         """
         Authenticate the request and return (user, auth) tuple.
-        
+
         Args:
             request: Django request object
-        
+
         Returns:
             Tuple of (MSALUser, token_claims) if authenticated, None otherwise
-        
+
         Raises:
             AuthenticationFailed: If token is invalid
         """

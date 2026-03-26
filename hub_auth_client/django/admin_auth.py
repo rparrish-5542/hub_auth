@@ -19,19 +19,19 @@ User = get_user_model()
 class MSALAdminBackend(BaseBackend):
     """
     Authentication backend that creates/authenticates Django users from MSAL tokens.
-    
+
     This backend:
     1. Validates MSAL JWT tokens
     2. Creates Django users automatically from token claims
     3. Updates user information on each login
     4. Grants superuser/staff permissions based on Azure AD roles
-    
+
     Usage in settings.py:
         AUTHENTICATION_BACKENDS = [
             'hub_auth_client.django.admin_auth.MSALAdminBackend',
             'django.contrib.auth.backends.ModelBackend',  # Fallback
         ]
-        
+
         # Optional: Map Azure AD roles to Django permissions
         MSAL_SUPERUSER_ROLES = ['Admin', 'GlobalAdmin']
         MSAL_STAFF_ROLES = ['Staff', 'Manager', 'Admin']
@@ -40,12 +40,12 @@ class MSALAdminBackend(BaseBackend):
     def authenticate(self, request, token=None, claims=None):
         """
         Authenticate user from MSAL token claims.
-        
+
         Args:
             request: Django request object
             token: MSAL JWT token (optional, will be extracted from request if not provided)
             claims: Pre-validated token claims (optional)
-        
+
         Returns:
             User instance if authentication succeeds, None otherwise
         """
@@ -88,10 +88,10 @@ class MSALAdminBackend(BaseBackend):
     def _validate_token(self, token):
         """
         Validate MSAL token and return claims.
-        
+
         Args:
             token: MSAL JWT token string
-        
+
         Returns:
             dict: Token claims if valid, None otherwise
         """
@@ -133,13 +133,13 @@ class MSALAdminBackend(BaseBackend):
     def _get_or_create_user(self, user_id, email, name, roles):
         """
         Get or create Django user from Azure AD information.
-        
+
         Args:
             user_id: Azure AD Object ID
             email: User email
             name: User display name
             roles: List of Azure AD roles
-        
+
         Returns:
             User instance
         """
@@ -157,13 +157,13 @@ class MSALAdminBackend(BaseBackend):
     def _create_user(self, user_id, email, name, roles):
         """
         Create new Django user from Azure AD information.
-        
+
         Args:
             user_id: Azure AD Object ID
             email: User email
             name: User display name
             roles: List of Azure AD roles
-        
+
         Returns:
             User instance
         """
@@ -193,13 +193,13 @@ class MSALAdminBackend(BaseBackend):
     def _update_user(self, user, email, name, roles):
         """
         Update existing Django user with latest Azure AD information.
-        
+
         Args:
             user: User instance
             email: User email
             name: User display name
             roles: List of Azure AD roles
-        
+
         Returns:
             Updated User instance
         """
@@ -251,10 +251,10 @@ class MSALAdminBackend(BaseBackend):
     def _has_superuser_role(self, roles):
         """
         Check if user has any role that grants superuser permissions.
-        
+
         Args:
             roles: List of Azure AD role names
-        
+
         Returns:
             bool: True if user should be superuser
         """
@@ -264,10 +264,10 @@ class MSALAdminBackend(BaseBackend):
     def _has_staff_role(self, roles):
         """
         Check if user has any role that grants staff permissions.
-        
+
         Args:
             roles: List of Azure AD role names
-        
+
         Returns:
             bool: True if user should be staff
         """
@@ -277,10 +277,10 @@ class MSALAdminBackend(BaseBackend):
     def get_user(self, user_id):
         """
         Get user by primary key.
-        
+
         Args:
             user_id: User primary key
-        
+
         Returns:
             User instance or None
         """

@@ -11,7 +11,7 @@ from django.db import models
 class RLSPolicy(models.Model):
     """
     Define a Row-Level Security policy for a database table.
-    
+
     This model stores the configuration for PostgreSQL RLS policies
     that can be generated and applied to your database tables.
     """
@@ -144,7 +144,7 @@ class RLSPolicy(models.Model):
     def get_using_expression(self):
         """
         Generate the USING expression for this policy.
-        
+
         Returns the custom expression if provided, otherwise generates
         from scope/role requirements.
         """
@@ -196,7 +196,7 @@ class RLSPolicy(models.Model):
     def get_with_check_expression(self):
         """
         Generate the WITH CHECK expression for this policy.
-        
+
         Returns the custom expression if provided, otherwise uses USING expression.
         """
         if self.with_check_expression:
@@ -207,7 +207,7 @@ class RLSPolicy(models.Model):
     def generate_create_policy_sql(self):
         """
         Generate the SQL statement to create this RLS policy.
-        
+
         Returns:
             str: SQL CREATE POLICY statement
         """
@@ -232,7 +232,7 @@ class RLSPolicy(models.Model):
     def generate_drop_policy_sql(self):
         """
         Generate the SQL statement to drop this RLS policy.
-        
+
         Returns:
             str: SQL DROP POLICY statement
         """
@@ -241,7 +241,7 @@ class RLSPolicy(models.Model):
     def generate_enable_rls_sql(self):
         """
         Generate the SQL statement to enable RLS on the table.
-        
+
         Returns:
             str: SQL ALTER TABLE statement
         """
@@ -251,7 +251,7 @@ class RLSPolicy(models.Model):
 class RLSTableConfig(models.Model):
     """
     Configuration for RLS on a specific table.
-    
+
     Controls whether RLS is enabled and how it behaves.
     """
 

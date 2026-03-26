@@ -3,18 +3,17 @@ Helper functions and utilities for Django admin customization.
 """
 
 import re
-
-from django.db import connection
 from django.utils.html import format_html
+from django.db import connection
 
 
 def format_active_badge(is_active):
     """
     Format active/inactive status as colored badge.
-    
+
     Args:
         is_active (bool): Whether the item is active
-        
+
     Returns:
         SafeString: HTML formatted badge
     """
@@ -25,7 +24,6 @@ def format_active_badge(is_active):
 
 def humanize_url_pattern(pattern):
     r"""
-    Convert a regex URL pattern to a human-readable description.
 
     Args:
         pattern (str): The regex URL pattern
@@ -38,6 +36,7 @@ def humanize_url_pattern(pattern):
         'admin/(?P<url>.*)$' -> '/admin/{url} (any path)'
         '^api/employees/(?P<pk>[^/.]+)/$' -> '/api/employees/{pk}/'
         '^api/employees\.(?P<format>[a-z0-9]+)/?$' -> '/api/employees.{format} (optional trailing slash)'
+    """
     if not pattern:
         return ''
 
@@ -97,11 +96,11 @@ def humanize_url_pattern(pattern):
 def format_masked_guid(value, visible_chars=12):
     """
     Format a GUID with masked characters, showing only the last portion.
-    
+
     Args:
         value (str): The GUID to mask
         visible_chars (int): Number of characters to show at the end
-        
+
     Returns:
         SafeString: HTML formatted masked GUID
     """
@@ -117,13 +116,13 @@ def format_masked_guid(value, visible_chars=12):
 def format_sensitive_field_with_reveal(value, field_id, obj_pk, visible_chars=12):
     """
     Format a sensitive field with a reveal button.
-    
+
     Args:
         value (str): The sensitive value to mask
         field_id (str): The field identifier (e.g., 'tenant_id', 'client_id')
         obj_pk: The primary key of the object
         visible_chars (int): Number of characters to show
-        
+
     Returns:
         SafeString: HTML formatted field with reveal button
     """
@@ -159,11 +158,11 @@ def format_sensitive_field_with_reveal(value, field_id, obj_pk, visible_chars=12
 def format_count_with_requirement(count, requirement=''):
     """
     Format a count with requirement type (e.g., "3 (ANY)").
-    
+
     Args:
         count (int): The count value
         requirement (str): The requirement type (e.g., 'any', 'all')
-        
+
     Returns:
         SafeString or str: Formatted count or '-' if zero
     """
@@ -176,11 +175,11 @@ def format_count_with_requirement(count, requirement=''):
 def format_badge(text, color='#28a745'):
     """
     Format text as a colored badge.
-    
+
     Args:
         text (str): The badge text
         color (str): Background color (hex)
-        
+
     Returns:
         SafeString: HTML formatted badge
     """
@@ -195,12 +194,12 @@ def format_badge(text, color='#28a745'):
 def format_validation_badges(validate_audience=False, validate_issuer=False, token_leeway=0):
     """
     Format validation settings as badges.
-    
+
     Args:
         validate_audience (bool): Whether audience validation is enabled
         validate_issuer (bool): Whether issuer validation is enabled
         token_leeway (int): Token leeway in seconds
-        
+
     Returns:
         SafeString: HTML formatted badges
     """
@@ -218,10 +217,10 @@ def format_validation_badges(validate_audience=False, validate_issuer=False, tok
 def format_action_badge(action):
     """
     Format action type as colored badge.
-    
+
     Args:
         action (str): The action type (e.g., 'created', 'updated', 'deleted')
-        
+
     Returns:
         SafeString: HTML formatted badge
     """
@@ -244,7 +243,7 @@ def format_action_badge(action):
 def is_postgresql_database():
     """
     Check if the current database is PostgreSQL.
-    
+
     Returns:
         bool: True if PostgreSQL, False otherwise
     """
@@ -255,13 +254,13 @@ def is_postgresql_database():
 def get_database_tables(exclude_system_tables=True):
     """
     Get list of tables from PostgreSQL database.
-    
+
     Args:
         exclude_system_tables (bool): Whether to exclude system tables
-        
+
     Returns:
         list: List of tuples (schema, table_name, rls_enabled, force_rls)
-        
+
     Raises:
         RuntimeError: If database is not PostgreSQL
     """
@@ -300,11 +299,11 @@ def get_database_tables(exclude_system_tables=True):
 def check_policy_exists(table_name, policy_name):
     """
     Check if an RLS policy exists in the database.
-    
+
     Args:
         table_name (str): The table name
         policy_name (str): The policy name
-        
+
     Returns:
         bool: True if policy exists, False otherwise
     """
@@ -325,10 +324,10 @@ def check_policy_exists(table_name, policy_name):
 def get_table_rls_status(table_name):
     """
     Get RLS status for a specific table.
-    
+
     Args:
         table_name (str): The table name
-        
+
     Returns:
         tuple or None: (rls_enabled, force_rls) or None if table not found
     """
@@ -348,10 +347,10 @@ def get_table_rls_status(table_name):
 def get_policy_count(table_name):
     """
     Count RLS policies for a specific table.
-    
+
     Args:
         table_name (str): The table name
-        
+
     Returns:
         int: Number of policies
     """
@@ -370,12 +369,12 @@ def get_policy_count(table_name):
 def execute_sql_safely(sql, params=None, error_message="SQL execution failed"):
     """
     Execute SQL with error handling.
-    
+
     Args:
         sql (str): SQL statement to execute
         params (list): Parameters for SQL statement
         error_message (str): Error message prefix
-        
+
     Returns:
         tuple: (success: bool, error: str or None)
     """
@@ -390,10 +389,10 @@ def execute_sql_safely(sql, params=None, error_message="SQL execution failed"):
 def format_sql_preview(sql):
     """
     Format SQL for preview in admin interface.
-    
+
     Args:
         sql (str): SQL statement
-        
+
     Returns:
         SafeString: HTML formatted SQL
     """

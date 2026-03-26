@@ -3,12 +3,12 @@ View decorators for MSAL token validation.
 
 Usage:
     from hub_auth_client.django import require_token, require_scopes
-    
+
     @require_token
     def my_view(request):
         # Token is validated, user info in request.msal_user
         ...
-    
+
     @require_scopes(['User.Read', 'Files.ReadWrite'])
     def my_view(request):
         # User has at least one of the required scopes
@@ -46,9 +46,9 @@ def get_validator():
 def require_token(view_func: Callable) -> Callable:
     """
     Decorator that requires a valid MSAL token.
-    
+
     Attaches token claims to request.msal_token and user info to request.msal_user.
-    
+
     Usage:
         @require_token
         def my_view(request):
@@ -88,17 +88,17 @@ def require_token(view_func: Callable) -> Callable:
 def require_scopes(required_scopes: List[str], require_all: bool = False) -> Callable:
     """
     Decorator that requires specific scopes.
-    
+
     Args:
         required_scopes: List of required scopes
         require_all: If True, all scopes required; if False, at least one (default: False)
-    
+
     Usage:
         @require_scopes(['User.Read', 'Files.ReadWrite'])
         def my_view(request):
             # User has at least one of the required scopes
             ...
-        
+
         @require_scopes(['User.Read', 'Files.ReadWrite'], require_all=True)
         def my_view(request):
             # User has both scopes
@@ -144,11 +144,11 @@ def require_scopes(required_scopes: List[str], require_all: bool = False) -> Cal
 def require_roles(required_roles: List[str], require_all: bool = False) -> Callable:
     """
     Decorator that requires specific roles.
-    
+
     Args:
         required_roles: List of required roles
         require_all: If True, all roles required; if False, at least one (default: False)
-    
+
     Usage:
         @require_roles(['Admin', 'Manager'])
         def my_view(request):

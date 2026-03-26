@@ -10,7 +10,7 @@ from django.db import models
 class ScopeDefinition(models.Model):
     """
     Define available scopes in your application.
-    
+
     These should match the scopes configured in Azure AD.
     """
 
@@ -47,7 +47,7 @@ class ScopeDefinition(models.Model):
 class RoleDefinition(models.Model):
     """
     Define available roles in your application.
-    
+
     These should match the app roles configured in Azure AD.
     """
 
@@ -79,7 +79,7 @@ class RoleDefinition(models.Model):
 class EndpointPermission(models.Model):
     """
     Define permissions required for specific endpoints.
-    
+
     Maps URL patterns to required scopes and roles.
     """
 
@@ -197,7 +197,7 @@ class EndpointPermission(models.Model):
 class APIEndpointMapping(models.Model):
     """
     Virtual model for displaying API endpoint to serializer mappings.
-    
+
     This model doesn't have a database table - it's used to dynamically
     discover ViewSets and their serializers from the installed Django app.
     """

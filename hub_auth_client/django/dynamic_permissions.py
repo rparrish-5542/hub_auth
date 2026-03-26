@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 class DynamicScopePermission(permissions.BasePermission):
     """
     Permission class that checks scopes based on database configuration.
-    
+
     Looks up the endpoint in the database and checks if user has required scopes.
-    
+
     Usage:
         class MyView(APIView):
             permission_classes = [DynamicScopePermission]
@@ -122,9 +122,9 @@ class DynamicScopePermission(permissions.BasePermission):
 class DynamicRolePermission(permissions.BasePermission):
     """
     Permission class that checks roles based on database configuration.
-    
+
     Looks up the endpoint in the database and checks if user has required roles.
-    
+
     Usage:
         class MyView(APIView):
             permission_classes = [DynamicRolePermission]
@@ -221,10 +221,10 @@ class DynamicRolePermission(permissions.BasePermission):
 class DynamicPermission(permissions.BasePermission):
     """
     Combined permission class that checks both scopes and roles from database.
-    
+
     This is the recommended permission class to use - it checks both scopes
     and roles based on database configuration.
-    
+
     Usage:
         class MyView(APIView):
             permission_classes = [DynamicPermission]

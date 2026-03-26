@@ -121,7 +121,7 @@ class Command(BaseCommand):
             if view_class:
                 if hasattr(view_class, 'http_method_names'):
                     methods = [m.upper() for m in view_class.http_method_names
-                              if hasattr(view_class, m)]
+                               if hasattr(view_class, m)]
                 else:
                     methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
             else:
@@ -177,7 +177,7 @@ class Command(BaseCommand):
                     try:
                         # Try to get serializer class without instantiating
                         serializer_class = view_class().get_serializer_class()
-                    except:
+                    except Exception:
                         pass
 
                 if serializer_class:
@@ -188,7 +188,7 @@ class Command(BaseCommand):
                     try:
                         serializer_fields = list(serializer_class().fields.keys())
                         endpoint['serializer_fields'] = serializer_fields
-                    except:
+                    except Exception:
                         endpoint['serializer_fields'] = []
                 else:
                     endpoint['serializer'] = None

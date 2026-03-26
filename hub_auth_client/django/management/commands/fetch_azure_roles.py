@@ -154,7 +154,7 @@ class Command(BaseCommand):
             roles = []
 
             # Get application details from Microsoft Graph
-            graph_url = f"https://graph.microsoft.com/v1.0/applications"
+            graph_url = "https://graph.microsoft.com/v1.0/applications"
             params = {
                 '$filter': f"appId eq '{client_id}'"
             }
@@ -174,7 +174,7 @@ class Command(BaseCommand):
             app = app_data['value'][0]
 
             # Display app info
-            self.stdout.write(self.style.SUCCESS(f"\n✓ Found Application:"))
+            self.stdout.write(self.style.SUCCESS("\n✓ Found Application:"))
             self.stdout.write(f"  Display Name: {app.get('displayName', 'N/A')}")
             self.stdout.write(f"  App ID: {app.get('appId', 'N/A')}")
             self.stdout.write(f"  Object ID: {app.get('id', 'N/A')}")

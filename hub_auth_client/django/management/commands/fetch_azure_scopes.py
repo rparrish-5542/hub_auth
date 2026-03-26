@@ -139,7 +139,7 @@ class Command(BaseCommand):
             access_token = token_response.json()['access_token']
 
             # Get application details from Microsoft Graph
-            graph_url = f"https://graph.microsoft.com/v1.0/applications"
+            graph_url = "https://graph.microsoft.com/v1.0/applications"
             headers = {
                 'Authorization': f'Bearer {access_token}',
                 'Content-Type': 'application/json'
@@ -184,7 +184,7 @@ class Command(BaseCommand):
 
             # OAuth2 Permission Scopes (delegated permissions) - This is where exposed API scopes are
             if 'api' in app:
-                self.stdout.write(self.style.SUCCESS(f"✓ Found 'api' key in app object"))
+                self.stdout.write(self.style.SUCCESS("✓ Found 'api' key in app object"))
                 self.stdout.write(self.style.WARNING(f"DEBUG: app['api'] keys: {list(app['api'].keys())}"))
 
                 if 'oauth2PermissionScopes' in app['api']:

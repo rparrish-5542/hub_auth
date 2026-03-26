@@ -23,11 +23,11 @@ logger = logging.getLogger(__name__)
 class MSALAuthenticationMiddleware(MiddlewareMixin):
     """
     Middleware to validate MSAL JWT tokens and attach user info to request.
-    
+
     Configuration in settings.py:
         AZURE_AD_TENANT_ID = "your-tenant-id"
         AZURE_AD_CLIENT_ID = "your-client-id"
-        
+
         # Optional settings
         MSAL_VALIDATE_AUDIENCE = True  # Default: True
         MSAL_VALIDATE_ISSUER = True    # Default: True

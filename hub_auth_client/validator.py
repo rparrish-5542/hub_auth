@@ -193,7 +193,7 @@ class AppTokenValidator:
 class MSALTokenValidator:
     """
     Validates JWT tokens issued by Microsoft Entra ID (Azure AD).
-    
+
     Supports both v1.0 and v2.0 tokens with comprehensive validation including:
     - Cryptographic signature verification
     - Standard JWT claims (exp, iat, nbf, aud, iss)
@@ -201,7 +201,7 @@ class MSALTokenValidator:
     - Scope-based RBAC
     - Role-based RBAC
     - Custom claim validation
-    
+
     Example:
         >>> validator = MSALTokenValidator(
         ...     tenant_id="your-tenant-id",
@@ -225,7 +225,7 @@ class MSALTokenValidator:
     ):
         """
         Initialize the MSAL token validator.
-        
+
         Args:
             tenant_id: Azure AD tenant ID
             client_id: Application (client) ID registered in Azure AD
@@ -263,17 +263,17 @@ class MSALTokenValidator:
     ) -> Tuple[bool, Optional[Dict[str, Any]], Optional[str]]:
         """
         Validate a JWT token from MSAL/Entra ID.
-        
+
         Args:
             token: The JWT token string (without 'Bearer ' prefix)
             required_scopes: List of required scopes (any or all based on require_all_scopes)
             required_roles: List of required roles (any or all based on require_all_roles)
             require_all_scopes: If True, token must have ALL required scopes (default: False = any)
             require_all_roles: If True, token must have ALL required roles (default: False = any)
-        
+
         Returns:
             Tuple of (is_valid, decoded_token, error_message)
-            
+
         Example:
             >>> is_valid, claims, error = validator.validate_token(
             ...     token,
@@ -389,14 +389,14 @@ class MSALTokenValidator:
     ) -> Optional[str]:
         """
         Perform additional claim validation.
-        
+
         Args:
             decoded_token: The decoded JWT payload
             required_scopes: Required scopes
             required_roles: Required roles
             require_all_scopes: Whether all scopes are required
             require_all_roles: Whether all roles are required
-        
+
         Returns:
             Error message if validation fails, None otherwise
         """
@@ -433,14 +433,14 @@ class MSALTokenValidator:
     ) -> Optional[str]:
         """
         Validate token has required scopes.
-        
+
         Scopes can be in 'scp' claim (space-separated string) or 'scopes' claim (list).
-        
+
         Args:
             decoded_token: Decoded token claims
             required_scopes: List of required scopes
             require_all: If True, all scopes must be present; if False, at least one
-        
+
         Returns:
             Error message if validation fails, None otherwise
         """
@@ -481,14 +481,14 @@ class MSALTokenValidator:
     ) -> Optional[str]:
         """
         Validate token has required roles.
-        
+
         Roles are in the 'roles' claim (list).
-        
+
         Args:
             decoded_token: Decoded token claims
             required_roles: List of required roles
             require_all: If True, all roles must be present; if False, at least one
-        
+
         Returns:
             Error message if validation fails, None otherwise
         """
@@ -513,10 +513,10 @@ class MSALTokenValidator:
     def extract_user_info(self, decoded_token: Dict[str, Any]) -> Dict[str, Any]:
         """
         Extract user information from decoded token.
-        
+
         Args:
             decoded_token: The decoded JWT payload
-        
+
         Returns:
             Dictionary with user information
         """
@@ -538,10 +538,10 @@ class MSALTokenValidator:
     def get_token_expiry(self, decoded_token: Dict[str, Any]) -> Optional[datetime]:
         """
         Get token expiration datetime.
-        
+
         Args:
             decoded_token: Decoded token claims
-        
+
         Returns:
             Token expiration as datetime object, or None if not present
         """
@@ -553,11 +553,11 @@ class MSALTokenValidator:
     def has_scope(self, decoded_token: Dict[str, Any], scope: str) -> bool:
         """
         Check if token has a specific scope.
-        
+
         Args:
             decoded_token: Decoded token claims
             scope: Scope to check for
-        
+
         Returns:
             True if token has the scope, False otherwise
         """
@@ -567,11 +567,11 @@ class MSALTokenValidator:
     def has_role(self, decoded_token: Dict[str, Any], role: str) -> bool:
         """
         Check if token has a specific role.
-        
+
         Args:
             decoded_token: Decoded token claims
             role: Role to check for
-        
+
         Returns:
             True if token has the role, False otherwise
         """
@@ -581,11 +581,11 @@ class MSALTokenValidator:
     def has_any_scope(self, decoded_token: Dict[str, Any], scopes: List[str]) -> bool:
         """
         Check if token has any of the specified scopes.
-        
+
         Args:
             decoded_token: Decoded token claims
             scopes: List of scopes to check for
-        
+
         Returns:
             True if token has at least one scope, False otherwise
         """
@@ -595,11 +595,11 @@ class MSALTokenValidator:
     def has_all_scopes(self, decoded_token: Dict[str, Any], scopes: List[str]) -> bool:
         """
         Check if token has all of the specified scopes.
-        
+
         Args:
             decoded_token: Decoded token claims
             scopes: List of scopes to check for
-        
+
         Returns:
             True if token has all scopes, False otherwise
         """

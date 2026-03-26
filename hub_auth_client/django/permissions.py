@@ -3,10 +3,10 @@ DRF permission classes for scope and role-based access control.
 
 Usage in views:
     from hub_auth_client.django import HasScopes, HasRoles
-    
+
     class MyView(APIView):
         permission_classes = [HasScopes(['User.Read', 'Files.ReadWrite'])]
-        
+
         def get(self, request):
             # User has at least one of the required scopes
             ...
@@ -20,7 +20,7 @@ from rest_framework import permissions
 class HasScopes(permissions.BasePermission):
     """
     Permission class that requires user to have at least one of the specified scopes.
-    
+
     Usage:
         permission_classes = [HasScopes(['User.Read', 'Files.ReadWrite'])]
     """
@@ -28,7 +28,7 @@ class HasScopes(permissions.BasePermission):
     def __init__(self, required_scopes: List[str]):
         """
         Initialize permission with required scopes.
-        
+
         Args:
             required_scopes: List of scopes (user needs at least one)
         """
@@ -59,7 +59,7 @@ class HasScopes(permissions.BasePermission):
 class HasAllScopes(permissions.BasePermission):
     """
     Permission class that requires user to have ALL of the specified scopes.
-    
+
     Usage:
         permission_classes = [HasAllScopes(['User.Read', 'Files.ReadWrite'])]
     """
@@ -67,7 +67,7 @@ class HasAllScopes(permissions.BasePermission):
     def __init__(self, required_scopes: List[str]):
         """
         Initialize permission with required scopes.
-        
+
         Args:
             required_scopes: List of scopes (user needs all of them)
         """
@@ -98,7 +98,7 @@ class HasAllScopes(permissions.BasePermission):
 class HasRoles(permissions.BasePermission):
     """
     Permission class that requires user to have at least one of the specified roles.
-    
+
     Usage:
         permission_classes = [HasRoles(['Admin', 'Manager'])]
     """
@@ -106,7 +106,7 @@ class HasRoles(permissions.BasePermission):
     def __init__(self, required_roles: List[str]):
         """
         Initialize permission with required roles.
-        
+
         Args:
             required_roles: List of roles (user needs at least one)
         """
@@ -137,7 +137,7 @@ class HasRoles(permissions.BasePermission):
 class HasAllRoles(permissions.BasePermission):
     """
     Permission class that requires user to have ALL of the specified roles.
-    
+
     Usage:
         permission_classes = [HasAllRoles(['Admin', 'Manager'])]
     """
@@ -145,7 +145,7 @@ class HasAllRoles(permissions.BasePermission):
     def __init__(self, required_roles: List[str]):
         """
         Initialize permission with required roles.
-        
+
         Args:
             required_roles: List of roles (user needs all of them)
         """

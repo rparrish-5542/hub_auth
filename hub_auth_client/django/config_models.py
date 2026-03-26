@@ -12,7 +12,7 @@ from django.db import models
 class AzureADConfiguration(models.Model):
     """
     Store Azure AD configuration in database.
-    
+
     Allows managing MSAL credentials through Django admin instead of environment variables.
     Only one active configuration should exist at a time.
     """
@@ -140,7 +140,7 @@ class AzureADConfiguration(models.Model):
     def get_validator_config(self):
         """
         Get configuration dict for MSALTokenValidator.
-        
+
         Returns:
             dict: Configuration for MSALTokenValidator
         """
@@ -156,7 +156,7 @@ class AzureADConfiguration(models.Model):
     def get_active_config(cls):
         """
         Get the active Azure AD configuration.
-        
+
         Returns:
             AzureADConfiguration or None
         """
@@ -171,7 +171,7 @@ class AzureADConfiguration(models.Model):
     def create_validator(self):
         """
         Create a configured MSALTokenValidator instance from this config.
-        
+
         Returns:
             MSALTokenValidator instance
         """
@@ -183,7 +183,7 @@ class AzureADConfiguration(models.Model):
     def get_validator(cls):
         """
         Get a configured MSALTokenValidator instance using active config.
-        
+
         Returns:
             MSALTokenValidator or None if no active config
         """
@@ -199,7 +199,7 @@ class AzureADConfiguration(models.Model):
 class AzureADConfigurationHistory(models.Model):
     """
     Audit log for Azure AD configuration changes.
-    
+
     Tracks when configurations are created, modified, activated, or deactivated.
     """
 

@@ -12,17 +12,17 @@ from django.utils.deprecation import MiddlewareMixin
 class RLSMiddleware(MiddlewareMixin):
     """
     Middleware to set PostgreSQL session variables for RLS policies.
-    
+
     This extracts information from the authenticated user (MSALUser)
     and sets session variables that RLS policies can reference.
-    
+
     Usage in settings.py:
         MIDDLEWARE = [
             ...
             'hub_auth_client.django.rls_middleware.RLSMiddleware',
             ...
         ]
-    
+
     Session variables set:
         - app.user_id: User's unique identifier (oid or email)
         - app.user_email: User's email address
@@ -35,7 +35,7 @@ class RLSMiddleware(MiddlewareMixin):
     def process_request(self, request):
         """
         Set PostgreSQL session variables based on the authenticated user.
-        
+
         This is called for every request after authentication middleware.
         """
         # Only process if user is authenticated and we're using PostgreSQL
@@ -110,7 +110,7 @@ class RLSMiddleware(MiddlewareMixin):
     def _get_nested_attr(self, obj, attr_path):
         """
         Get a nested attribute from an object.
-        
+
         Example: _get_nested_attr(user, "department.id") 
                  -> user.department.id
         """
@@ -128,7 +128,7 @@ class RLSMiddleware(MiddlewareMixin):
     def _set_session_variables(self, variables):
         """
         Set PostgreSQL session variables using SET LOCAL.
-        
+
         Args:
             variables: Dict of variable_name -> value
         """
@@ -151,7 +151,7 @@ class RLSMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
         """
         Clear session variables after response (optional).
-        
+
         PostgreSQL SET LOCAL automatically clears at transaction end,
         so this is mostly for cleanup/safety.
         """
@@ -161,7 +161,7 @@ class RLSMiddleware(MiddlewareMixin):
 class RLSDebugMiddleware(MiddlewareMixin):
     """
     Debug middleware to log RLS session variables.
-    
+
     Usage in settings.py (only in development):
         MIDDLEWARE = [
             ...
@@ -205,7 +205,7 @@ class RLSDebugMiddleware(MiddlewareMixin):
                     except Exception:
                         logger.debug(f"  {var_name}: <not set>")
 
-        except Exception as e:
+        except Exception:
             pass
 
         return None
