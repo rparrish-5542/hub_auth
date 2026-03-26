@@ -13,7 +13,7 @@ We release patches for security vulnerabilities for the following versions:
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-Instead, please report them via email to: security@wedgwood.org
+Instead, please report them via email to: 
 
 You should receive a response within 48 hours. If for some reason you do not, please follow up via email to ensure we received your original message.
 
@@ -120,8 +120,8 @@ We recognize security researchers who responsibly disclose vulnerabilities:
 
 ## Contact
 
-- Security Email: security@wedgwood.org
-- General Questions: support@wedgwood.org
+- Security Email: 
+- General Questions: 
 - Project Maintainer: Ryan Parrish
 
 ---
