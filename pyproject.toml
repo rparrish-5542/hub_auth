@@ -8,7 +8,7 @@ version = "1.0.48"
 description = "MSAL JWT validation library with Entra ID RBAC support"
 readme = "README_PACKAGE.md"
 requires-python = ">=3.8"
-license = {text = "MIT"}
+license = "MIT"
 license-files = ["LICENSE"]
 authors = [
     {name = "Ryan Parrish", email = "rparrish@wedgwood.org"}
@@ -17,7 +17,6 @@ keywords = ["msal", "jwt", "azure", "entra", "authentication", "rbac", "validati
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Framework :: Django",
 ]
