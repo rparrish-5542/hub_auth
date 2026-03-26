@@ -257,7 +257,7 @@ class Command(BaseCommand):
                 ms_graph = data['value'][0]
 
                 if 'appRoles' in ms_graph:
-                    self.stdout.write(self.style.SUCCESS(f"\n✓ Found {len(ms_graph['appRoles'])} Microsoft Graph roles"))
+                    self.stdout.write(self.style.SUCCESS(f"\n✓ Found {len(ms_graph['appRoles'])} Microsoft Graph roles"))  # noqa: E501
 
                     for role in ms_graph['appRoles']:
                         if role.get('isEnabled', True) and role.get('value'):

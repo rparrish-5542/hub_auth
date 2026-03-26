@@ -111,7 +111,7 @@ class RLSMiddleware(MiddlewareMixin):
         """
         Get a nested attribute from an object.
 
-        Example: _get_nested_attr(user, "department.id") 
+        Example: _get_nested_attr(user, "department.id")
                  -> user.department.id
         """
         parts = attr_path.split('.')

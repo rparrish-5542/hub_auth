@@ -205,11 +205,11 @@ def format_validation_badges(validate_audience=False, validate_issuer=False, tok
     """
     badges = []
     if validate_audience:
-        badges.append('<span style="background-color: #17a2b8; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">AUD</span>')
+        badges.append('<span style="background-color: #17a2b8; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">AUD</span>')  # noqa: E501
     if validate_issuer:
-        badges.append('<span style="background-color: #17a2b8; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">ISS</span>')
+        badges.append('<span style="background-color: #17a2b8; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">ISS</span>')  # noqa: E501
     if token_leeway > 0:
-        badges.append(f'<span style="background-color: #ffc107; color: black; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Leeway: {token_leeway}s</span>')
+        badges.append(f'<span style="background-color: #ffc107; color: black; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Leeway: {token_leeway}s</span>')  # noqa: E501
 
     return format_html(' '.join(badges)) if badges else '-'
 
@@ -270,7 +270,7 @@ def get_database_tables(exclude_system_tables=True):
     with connection.cursor() as cursor:
         if exclude_system_tables:
             cursor.execute("""
-                SELECT 
+                SELECT
                     schemaname,
                     tablename,
                     relrowsecurity,
@@ -283,7 +283,7 @@ def get_database_tables(exclude_system_tables=True):
             """)
         else:
             cursor.execute("""
-                SELECT 
+                SELECT
                     schemaname,
                     tablename,
                     relrowsecurity,

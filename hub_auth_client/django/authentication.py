@@ -36,7 +36,7 @@ class MSALUser:
         # V1 tokens: oid is the user's object ID
         # V2 tokens: oid is present, sub is also available but may be different
         self.object_id = claims.get('oid') or claims.get('sub')
-        self.username = claims.get('upn') or claims.get('unique_name') or claims.get('preferred_username') or self.object_id
+        self.username = claims.get('upn') or claims.get('unique_name') or claims.get('preferred_username') or self.object_id  # noqa: E501
         self.email = claims.get('email') or claims.get('preferred_username') or claims.get('upn')
         self.name = claims.get('name')
         self.scopes = claims.get('scp', '').split() if claims.get('scp') else claims.get('scopes', [])

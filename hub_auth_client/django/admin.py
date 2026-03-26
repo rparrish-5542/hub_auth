@@ -1595,7 +1595,7 @@ if CONFIG_AVAILABLE:
                     'client_secret_reveal',
                     'client_secret'
                 ],
-                'description': 'Find these values in Azure Portal > App registrations. Click the eye icon to reveal masked values. Update the Client Secret field below to change it.'
+                'description': 'Find these values in Azure Portal > App registrations. Click the eye icon to reveal masked values. Update the Client Secret field below to change it.'  # noqa: E501
             }),
             ('Token Validation Settings', {
                 'fields': [
@@ -1632,7 +1632,7 @@ if CONFIG_AVAILABLE:
             """Display name with active badge."""
             if obj.is_active:
                 return format_html(
-                    '<strong>{}</strong> <span style="background-color: #28a745; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px;">ACTIVE</span>',
+                    '<strong>{}</strong> <span style="background-color: #28a745; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px;">ACTIVE</span>',  # noqa: E501
                     obj.name)
             return format_html('<span>{}</span>', obj.name)
         name_badge.short_description = 'Name'
@@ -1729,13 +1729,13 @@ if CONFIG_AVAILABLE:
             badges = []
             if obj.validate_audience:
                 badges.append(
-                    '<span style="background-color: #17a2b8; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">AUD</span>')
+                    '<span style="background-color: #17a2b8; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">AUD</span>')  # noqa: E501
             if obj.validate_issuer:
                 badges.append(
-                    '<span style="background-color: #17a2b8; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">ISS</span>')
+                    '<span style="background-color: #17a2b8; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">ISS</span>')  # noqa: E501
             if obj.token_leeway > 0:
                 badges.append(
-                    f'<span style="background-color: #ffc107; color: black; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Leeway: {
+                    f'<span style="background-color: #ffc107; color: black; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Leeway: {  # noqa: E501
                         obj.token_leeway}s</span>')
 
             return mark_safe(' '.join(badges)) if badges else '-'  # nosec B308 B703 - Badges are internally generated
@@ -1903,7 +1903,7 @@ if CONFIG_AVAILABLE:
             }
             color = colors.get(obj.action, '#6c757d')
             return format_html(
-                '<span style="background-color: {}; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px;">{}</span>',
+                '<span style="background-color: {}; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px;">{}</span>',  # noqa: E501
                 color,
                 obj.get_action_display())
         action_badge.short_description = 'Action'
@@ -2097,7 +2097,7 @@ class APIEndpointMappingAdmin(admin.ModelAdmin):
                                 'viewset': name,
                                 'url': f'{method_str} {url}',
                                 'action': f'Custom action - {method_name}',
-                                'serializer': serializer_info.get(method_name, serializer_info.get('default', '(auto)')) + ' ✅',
+                                'serializer': serializer_info.get(method_name, serializer_info.get('default', '(auto)')) + ' ✅',  # noqa: E501
                                 'http_method': method_str,
                                 'order': order,
                                 'app': app_config.split('.')[-1]
@@ -2459,7 +2459,7 @@ class APIEndpointMappingAdmin(admin.ModelAdmin):
                         }
                         color = method_colors.get(self.http_method, '#000000')
                         self.url_display = format_html(
-                            '<code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; color: {}; font-weight: bold;">{}</code>',
+                            '<code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; color: {}; font-weight: bold;">{}</code>',  # noqa: E501
                             color,
                             self.url)
 
@@ -2490,7 +2490,7 @@ class APIEndpointMappingAdmin(admin.ModelAdmin):
 
                         # Compute app_display
                         self.app_display = format_html(
-                            '<span style="background: #e0e0e0; padding: 2px 6px; border-radius: 3px; font-size: 11px;">{}</span>', self.app)
+                            '<span style="background: #e0e0e0; padding: 2px 6px; border-radius: 3px; font-size: 11px;">{}</span>', self.app)  # noqa: E501
 
                 # Discover endpoints dynamically
                 endpoint_data = request._endpoint_data

@@ -205,7 +205,7 @@ class Command(BaseCommand):
                         scopes.append({
                             'name': full_scope_name,
                             'short_name': scope_value,
-                            'description': scope.get('adminConsentDescription', scope.get('userConsentDescription', '')),
+                            'description': scope.get('adminConsentDescription', scope.get('userConsentDescription', '')),  # noqa: E501
                             'category': 'delegated',
                             'type': 'oauth2',
                             'enabled': scope.get('isEnabled', True),
@@ -218,7 +218,7 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(self.style.ERROR("✗ No 'api' key found in app object"))
                 self.stdout.write(self.style.WARNING(f"DEBUG: Available top-level keys: {list(app.keys())}"))
-                self.stdout.write(self.style.WARNING(f"DEBUG: Keys containing 'api', 'scope', or 'permission': {[k for k in app.keys() if 'api' in k.lower() or 'scope' in k.lower() or 'permission' in k.lower()]}"))
+                self.stdout.write(self.style.WARNING(f"DEBUG: Keys containing 'api', 'scope', or 'permission': {[k for k in app.keys() if 'api' in k.lower() or 'scope' in k.lower() or 'permission' in k.lower()]}"))  # noqa: E501
 
                 # Try alternative: use beta endpoint which has more details
                 self.stdout.write(self.style.WARNING("\nTrying Microsoft Graph beta endpoint for more details..."))
@@ -232,11 +232,11 @@ class Command(BaseCommand):
 
                     if 'api' in beta_app:
                         self.stdout.write(self.style.SUCCESS("✓ Found 'api' key in beta endpoint"))
-                        self.stdout.write(self.style.WARNING(f"DEBUG: beta_app['api'] keys: {list(beta_app['api'].keys())}"))
+                        self.stdout.write(self.style.WARNING(f"DEBUG: beta_app['api'] keys: {list(beta_app['api'].keys())}"))  # noqa: E501
 
                         if 'oauth2PermissionScopes' in beta_app['api']:
                             oauth_scopes = beta_app['api']['oauth2PermissionScopes']
-                            self.stdout.write(self.style.SUCCESS(f"✓ Found {len(oauth_scopes)} OAuth2 permission scopes in beta endpoint"))
+                            self.stdout.write(self.style.SUCCESS(f"✓ Found {len(oauth_scopes)} OAuth2 permission scopes in beta endpoint"))  # noqa: E501
 
                             for scope in oauth_scopes:
                                 scope_value = scope.get('value', '')
@@ -251,7 +251,7 @@ class Command(BaseCommand):
                                 scopes.append({
                                     'name': full_scope_name,
                                     'short_name': scope_value,
-                                    'description': scope.get('adminConsentDescription', scope.get('userConsentDescription', '')),
+                                    'description': scope.get('adminConsentDescription', scope.get('userConsentDescription', '')),  # noqa: E501
                                     'category': 'delegated',
                                     'type': 'oauth2',
                                     'enabled': scope.get('isEnabled', True),
@@ -266,7 +266,7 @@ class Command(BaseCommand):
                             self.stdout.write(json.dumps(beta_app, indent=2)[:2000])  # First 2000 chars
                     else:
                         self.stdout.write(self.style.ERROR("✗ No 'api' key in beta endpoint either"))
-                        self.stdout.write(self.style.WARNING(f"DEBUG: Beta keys: {[k for k in beta_app.keys() if 'api' in k.lower() or 'scope' in k.lower() or 'permission' in k.lower()]}"))
+                        self.stdout.write(self.style.WARNING(f"DEBUG: Beta keys: {[k for k in beta_app.keys() if 'api' in k.lower() or 'scope' in k.lower() or 'permission' in k.lower()]}"))  # noqa: E501
                 except Exception as beta_error:
                     self.stdout.write(self.style.ERROR(f"Error trying beta endpoint: {beta_error}"))
 

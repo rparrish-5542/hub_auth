@@ -182,7 +182,7 @@ class AppTokenValidator:
             "subject": decoded_token.get("sub"),
             "email": decoded_token.get("email"),
             "name": decoded_token.get("name"),
-            "scopes": decoded_token.get("scp", "").split() if decoded_token.get("scp") else decoded_token.get("scopes", []),
+            "scopes": decoded_token.get("scp", "").split() if decoded_token.get("scp") else decoded_token.get("scopes", []),  # noqa: E501
             "roles": decoded_token.get("roles", []),
             "groups": decoded_token.get("groups", []),
             "audience": decoded_token.get("aud"),
@@ -299,7 +299,7 @@ class MSALTokenValidator:
             unverified_claims = jwt.decode(token, options={"verify_signature": False})
             logger.debug(f"Token tenant_id: {unverified_claims.get('tid')}, expected: {self.tenant_id}")
             logger.debug(f"Token audience: {unverified_claims.get('aud')}, expected: {self.client_id}")
-            logger.debug(f"Token issuer: {unverified_claims.get('iss')}, expected: {self.issuer_v1} or {self.issuer_v2}")
+            logger.debug(f"Token issuer: {unverified_claims.get('iss')}, expected: {self.issuer_v1} or {self.issuer_v2}")  # noqa: E501
 
             # Get the signing key from Azure AD's JWKS endpoint
             signing_key = self.jwks_client.get_signing_key(kid)
@@ -333,7 +333,7 @@ class MSALTokenValidator:
                     f"api://{self.client_id}",
                 ]
                 if token_audience not in valid_audiences:
-                    return False, decoded_token, f"Invalid audience: {token_audience}. Expected: {self.client_id} or api://{self.client_id}"
+                    return False, decoded_token, f"Invalid audience: {token_audience}. Expected: {self.client_id} or api://{self.client_id}"  # noqa: E501
 
             # Validate issuer manually (support both v1.0 and v2.0)
             if self.validate_issuer:
@@ -528,7 +528,7 @@ class MSALTokenValidator:
             'name': decoded_token.get('name'),
             'given_name': decoded_token.get('given_name'),
             'family_name': decoded_token.get('family_name'),
-            'scopes': decoded_token.get('scp', '').split() if decoded_token.get('scp') else decoded_token.get('scopes', []),
+            'scopes': decoded_token.get('scp', '').split() if decoded_token.get('scp') else decoded_token.get('scopes', []),  # noqa: E501
             'roles': decoded_token.get('roles', []),
             'groups': decoded_token.get('groups', []),
             'app_id': decoded_token.get('appid'),
