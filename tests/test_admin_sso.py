@@ -10,6 +10,7 @@ from django.test import RequestFactory, TestCase
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.messages.storage.fallback import FallbackStorage
+from urllib.parse import urlparse
 
 
 def get_admin_backend():
@@ -258,7 +259,8 @@ class TestMSALAdminLoginView:
         response = self.view(request)
         
         assert response.status_code == 302
-        assert 'login.microsoftonline.com' in response.url
+        parsed_url = urlparse(response.url)
+        assert parsed_url.hostname == 'login.microsoftonline.com'
         assert 'tenant-123' in response.url
         assert 'client-456' in response.url
         assert 'msal_state' in request.session
