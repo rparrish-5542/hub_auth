@@ -2,22 +2,13 @@ name: Build and Publish hub-auth-client
 
 on:
   push:
-    branches:
-      - main
     tags:
-      - 'v*.*.*'  # Trigger on version tags (e.g., v1.0.45)
-    paths:
-      - 'hub_auth_client/**'
-      - 'setup.py'
-      - 'pyproject.toml'
-      - 'README_PACKAGE.md'
+      - 'v*.*.*'  # Always trigger on version tags for publishing
+    branches:
+      - main  # Trigger on main for validation only
   pull_request:
     branches:
       - main
-    paths:
-      - 'hub_auth_client/**'
-      - 'setup.py'
-      - 'pyproject.toml'
   release:
     types: [published]
   workflow_dispatch:  # Allow manual trigger
