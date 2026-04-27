@@ -7,4 +7,4 @@ pytest-mock>=3.11.1
 # Django for integration tests
 Django>=4.2
 djangorestframework>=3.14.0
-psycopg2-binary>=2.9.0  # For testing PostgreSQL features
+psycopg2-binary>=2.9.12  # For testing PostgreSQL features
