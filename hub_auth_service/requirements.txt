@@ -2,7 +2,7 @@
 
 # Django and Core Dependencies
 Django>=5.2.8
-psycopg2-binary>=2.9.9
+psycopg2-binary>=2.9.12
 
 # Django REST Framework
 djangorestframework>=3.14.0
