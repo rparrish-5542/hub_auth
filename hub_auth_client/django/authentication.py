@@ -178,7 +178,11 @@ class MSALAuthentication(authentication.BaseAuthentication):
             used_app_token = is_valid
 
         if not is_valid:
-            raise AuthenticationFailed(error or 'Invalid token')
+            # Return None instead of raising AuthenticationFailed to allow other
+            # authentication classes to try (e.g., E2ETestAuthentication in test mode).
+            # DRF will raise a 403 Forbidden if no authentication class returns a user.
+            logger.debug(f"MSAL authentication failed: {error}")
+            return None
 
         # Create user object from claims
         user = MSALUser(claims) if not used_app_token else MSALUser(claims)
