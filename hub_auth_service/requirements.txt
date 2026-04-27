@@ -5,9 +5,9 @@ Django>=5.2.8
 psycopg2-binary>=2.9.9
 
 # Django REST Framework
-djangorestframework>=3.14.0
-django-cors-headers>=4.3.1
-django-filter>=23.5
+djangorestframework>=3.16.1
+django-cors-headers>=4.9.0
+django-filter>=25.1
 
 # JWT and Azure AD
 PyJWT>=2.8.0
