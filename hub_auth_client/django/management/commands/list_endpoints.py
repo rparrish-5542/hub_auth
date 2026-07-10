@@ -178,7 +178,7 @@ class Command(BaseCommand):
                         # Try to get serializer class without instantiating
                         serializer_class = view_class().get_serializer_class()
                     except Exception:
-                        pass
+                        pass  # Serializer class unavailable without full request context
 
                 if serializer_class:
                     endpoint['serializer'] = serializer_class.__name__

@@ -16,10 +16,13 @@ Usage:
 """
 
 import functools
+import logging
 from typing import Callable, List
 
 from django.conf import settings
 from django.http import JsonResponse
+
+logger = logging.getLogger(__name__)
 
 from ..validator import MSALTokenValidator
 
@@ -71,10 +74,8 @@ def require_token(view_func: Callable) -> Callable:
         is_valid, claims, error = validator.validate_token(auth_header)
 
         if not is_valid:
-            return JsonResponse(
-                {'error': 'Invalid token', 'message': error},
-                status=401
-            )
+            logger.warning("Token validation failed: %s", error)
+            return JsonResponse({'error': 'Invalid token'}, status=401)
 
         # Attach to request
         request.msal_token = claims
@@ -125,10 +126,8 @@ def require_scopes(required_scopes: List[str], require_all: bool = False) -> Cal
             )
 
             if not is_valid:
-                return JsonResponse(
-                    {'error': 'Insufficient scopes', 'message': error},
-                    status=403
-                )
+                logger.warning("Scope check failed: %s", error)
+                return JsonResponse({'error': 'Insufficient scopes'}, status=403)
 
             # Attach to request
             request.msal_token = claims
@@ -176,10 +175,8 @@ def require_roles(required_roles: List[str], require_all: bool = False) -> Calla
             )
 
             if not is_valid:
-                return JsonResponse(
-                    {'error': 'Insufficient roles', 'message': error},
-                    status=403
-                )
+                logger.warning("Role check failed: %s", error)
+                return JsonResponse({'error': 'Insufficient roles'}, status=403)
 
             # Attach to request
             request.msal_token = claims

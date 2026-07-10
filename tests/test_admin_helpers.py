@@ -1,7 +1,6 @@
 """
 Tests for admin helper functions.
 """
-import pytest
 from hub_auth_client.django.admin_helpers import (
     humanize_url_pattern,
     format_active_badge,

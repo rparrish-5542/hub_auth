@@ -5,10 +5,9 @@ Tests the admin authentication backend and SSO login views.
 """
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
-from django.test import RequestFactory, TestCase
+from unittest.mock import Mock, patch
+from django.test import RequestFactory
 from django.contrib.sessions.middleware import SessionMiddleware
-from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.messages.storage.fallback import FallbackStorage
 from urllib.parse import urlparse
 

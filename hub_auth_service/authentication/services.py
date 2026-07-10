@@ -2,14 +2,12 @@
 """JWT Token validation service for MSAL tokens."""
 import logging
 import time
-import requests
 from typing import Dict, Optional, Tuple
 from datetime import datetime, timedelta
 import jwt
 from jwt import PyJWKClient
 from django.conf import settings
 from django.utils import timezone
-from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 

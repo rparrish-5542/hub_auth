@@ -4,7 +4,6 @@ This will help us discover any missing attributes before publishing.
 """
 
 import sys
-import os
 import django
 from django.conf import settings
 
@@ -53,7 +52,6 @@ if not settings.configured:
 # Now import Django components
 from django.db import models
 from django.contrib.admin.utils import display_for_field
-from django.test import RequestFactory
 
 
 # Create the exact MockField from admin.py for testing

@@ -105,7 +105,7 @@ class Command(BaseCommand):
                     'client_secret': active_config.client_secret
                 }
         except Exception:
-            pass
+            pass  # Database config unavailable; fall back to settings
 
         # Try settings
         if hasattr(settings, 'AZURE_AD_TENANT_ID'):

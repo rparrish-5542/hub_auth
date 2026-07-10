@@ -206,6 +206,6 @@ class RLSDebugMiddleware(MiddlewareMixin):
                         logger.debug(f"  {var_name}: <not set>")
 
         except Exception:
-            pass
+            logger.debug("Failed to log RLS session variables", exc_info=True)
 
         return None

@@ -12,6 +12,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.shortcuts import redirect
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import View
 
 logger = logging.getLogger(__name__)
@@ -74,7 +75,7 @@ class MSALAdminLoginView(View):
             if config:
                 return (config.tenant_id, config.client_id)
         except Exception:
-            pass
+            logger.debug("Azure AD config not available from database, falling back to settings")
 
         # Fall back to settings
         tenant_id = getattr(settings, 'AZURE_AD_TENANT_ID', None)
@@ -122,7 +123,7 @@ class MSALAdminCallbackView(View):
         error = request.GET.get('error')
         if error:
             error_description = request.GET.get('error_description', error)
-            logger.warning(f"MSAL login error: {error_description}")
+            logger.warning("MSAL login error: %s", error_description)
             messages.error(request, f"Login failed: {error_description}")
             return redirect('/admin/login/')
 
@@ -161,7 +162,7 @@ class MSALAdminCallbackView(View):
 
         # Check if user has admin access
         if not user.is_staff:
-            logger.warning(f"User {user.username} attempted admin login without staff privileges")
+            logger.warning("User %s attempted admin login without staff privileges", user.username)
             messages.error(request, "You do not have permission to access the admin site")
             return redirect('/admin/login/')
 
@@ -169,15 +170,19 @@ class MSALAdminCallbackView(View):
         user.backend = 'hub_auth_client.django.admin_auth.MSALAdminBackend'
         login(request, user)
 
-        logger.info(f"User {user.username} logged in via MSAL")
+        logger.info("User %s logged in via MSAL", user.username)
         messages.success(request, f"Welcome, {user.get_full_name() or user.username}!")
 
         # Clean up session
         request.session.pop('msal_state', None)
         request.session.pop('msal_redirect_uri', None)
 
-        # Redirect to admin
+        # Redirect to admin — validate next URL to prevent open redirects
         next_url = request.GET.get('next', '/admin/')
+        if not url_has_allowed_host_and_scheme(
+            next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+        ):
+            next_url = '/admin/'
         return redirect(next_url)
 
     def _exchange_code_for_token(self, request, code):
@@ -227,7 +232,7 @@ class MSALAdminCallbackView(View):
             response.raise_for_status()
             return response.json()
         except Exception as e:
-            logger.exception(f"Error exchanging code for token: {e}")
+            logger.exception("Error exchanging code for token: %s", e)
             return None
 
     def _validate_id_token(self, id_token):
@@ -281,7 +286,7 @@ class MSALAdminCallbackView(View):
             if config:
                 return (config.tenant_id, config.client_id, config.client_secret)
         except Exception:
-            pass
+            logger.debug("Azure AD config not available from database, falling back to settings")
 
         # Fall back to settings
         tenant_id = getattr(settings, 'AZURE_AD_TENANT_ID', None)

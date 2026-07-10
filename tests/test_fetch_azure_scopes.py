@@ -2,10 +2,9 @@
 Tests for fetch_azure_scopes management command.
 """
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 from io import StringIO
 from django.core.management import call_command
-from django.core.management.base import CommandError
 
 
 class TestFetchAzureScopesCommand:

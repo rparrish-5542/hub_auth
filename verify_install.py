@@ -17,17 +17,16 @@ def verify_installation():
     # Test 1: Import main package
     print("\n1. Testing package import...")
     try:
-        import hub_auth_client
+        from hub_auth_client import MSALTokenValidator, __version__
         print(f"   ✓ Package imported successfully")
-        print(f"   ✓ Version: {hub_auth_client.__version__}")
+        print(f"   ✓ Version: {__version__}")
     except ImportError as e:
         print(f"   ✗ Failed to import package: {e}")
         return False
-    
+
     # Test 2: Import validator
     print("\n2. Testing validator import...")
     try:
-        from hub_auth_client import MSALTokenValidator
         print(f"   ✓ MSALTokenValidator imported successfully")
     except ImportError as e:
         print(f"   ✗ Failed to import validator: {e}")
@@ -50,7 +49,7 @@ def verify_installation():
     # Test 4: Create validator instance
     print("\n4. Testing validator initialization...")
     try:
-        validator = MSALTokenValidator(
+        _validator = MSALTokenValidator(
             tenant_id="test-tenant-id",
             client_id="test-client-id"
         )

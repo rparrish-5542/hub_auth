@@ -4,8 +4,7 @@ Tests for hub_auth_client.django.dynamic_permissions module.
 Tests the dynamic permission classes that load requirements from database.
 """
 
-import pytest
-from unittest.mock import Mock, MagicMock, patch
+from unittest.mock import Mock, patch
 from hub_auth_client.django.dynamic_permissions import (
     DynamicScopePermission,
     DynamicRolePermission,

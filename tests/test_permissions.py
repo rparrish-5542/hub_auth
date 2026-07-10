@@ -4,8 +4,7 @@ Tests for hub_auth_client.django.permissions module.
 Tests DRF permission classes for scope and role-based access control.
 """
 
-import pytest
-from unittest.mock import Mock, MagicMock
+from unittest.mock import Mock
 from hub_auth_client.django.permissions import (
     HasScopes,
     HasAllScopes,

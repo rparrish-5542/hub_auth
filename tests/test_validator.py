@@ -5,11 +5,7 @@ Run with: pytest tests/
 """
 
 import pytest
-import jwt
 from datetime import datetime, timedelta, timezone
-from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.backends import default_backend
 
 from hub_auth_client import MSALTokenValidator
 from hub_auth_client.exceptions import (

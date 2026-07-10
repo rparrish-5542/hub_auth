@@ -1,8 +1,6 @@
 """
 Tests for admin mixins.
 """
-import pytest
-from django.contrib.admin import ModelAdmin
 from hub_auth_client.django.admin_mixins import (
     URLPatternMixin,
     ActiveBadgeMixin,
@@ -174,9 +172,9 @@ class TestRoleCountMixin:
         """Test role count with no roles."""
         from unittest.mock import MagicMock
         
-        mixin = RoleCountMixin()
-        
-        mock_queryset = MagicMock()
+        _mixin = RoleCountMixin()
+
+        _mock_queryset = MagicMock()
 class TestMixinCombination:
     """Test using multiple mixins together."""
     

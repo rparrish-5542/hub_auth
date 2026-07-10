@@ -1,8 +1,7 @@
 """Tests for Django integration."""
 
 import pytest
-from unittest.mock import Mock, patch
-from django.test import RequestFactory
+from unittest.mock import patch
 from rest_framework.test import APIRequestFactory
 
 from hub_auth_client.django.authentication import MSALUser, MSALAuthentication

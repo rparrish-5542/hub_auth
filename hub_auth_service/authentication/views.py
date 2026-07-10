@@ -7,7 +7,6 @@ from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from django.utils import timezone
-from django.db import transaction
 
 from .models import User, TokenValidation, ServiceClient
 from .serializers import (
@@ -62,7 +61,7 @@ def validate_token(request):
     try:
         service_client = ServiceClient.objects.get(api_key=api_key, is_active=True)
     except ServiceClient.DoesNotExist:
-        logger.warning(f"Invalid API key attempted from IP: {get_client_ip(request)}")
+        logger.warning("Invalid API key attempted from IP: %s", get_client_ip(request))
         return Response(
             {'error': 'Invalid or inactive API key'},
             status=status.HTTP_401_UNAUTHORIZED
@@ -196,10 +195,10 @@ def validate_token_simple(request):
                 }
             })
         except Exception as e:
-            logger.error(f"Error syncing user: {str(e)}", exc_info=True)
-            return Response({'is_valid': False, 'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
-    
-    return Response({'is_valid': False, 'error': error_message}, status=status.HTTP_401_UNAUTHORIZED)
+            logger.error("Error syncing user: %s", e, exc_info=True)
+            return Response({'is_valid': False, 'error': 'Authentication failed'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    return Response({'is_valid': False, 'error': 'Authentication failed'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class ServiceClientViewSet(viewsets.ReadOnlyModelViewSet):

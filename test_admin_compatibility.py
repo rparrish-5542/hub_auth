@@ -3,6 +3,7 @@ Comprehensive test to check for potential Django admin compatibility issues.
 """
 import os
 import re
+import sys
 
 def check_django_admin_compatibility():
     """Check for common Django admin compatibility issues."""
@@ -173,6 +174,6 @@ if __name__ == '__main__':
     print()
     
     if all_issues:
-        exit(1)
+        sys.exit(1)
     else:
-        exit(0)
+        sys.exit(0)

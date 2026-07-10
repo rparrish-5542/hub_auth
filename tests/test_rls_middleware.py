@@ -99,8 +99,8 @@ class TestRLSMiddleware:
         mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
         
         with patch.object(middleware, '_set_session_variables') as mock_set_vars:
-            result = middleware.process_request(request)
-        
+            _result = middleware.process_request(request)
+
         call_args = mock_set_vars.call_args[0][0]
         assert call_args['app.user_id'] == 'test@example.com'
     

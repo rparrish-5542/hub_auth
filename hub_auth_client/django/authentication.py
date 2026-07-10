@@ -14,7 +14,6 @@ from typing import Optional, Tuple
 
 from django.conf import settings
 from rest_framework import authentication
-from rest_framework.exceptions import AuthenticationFailed
 
 from ..validators.app import AppTokenValidator
 from ..validators.msal import MSALTokenValidator

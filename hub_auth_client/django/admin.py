@@ -2137,7 +2137,7 @@ class APIEndpointMappingAdmin(admin.ModelAdmin):
 
             return f'/api/{viewset_name}s'
 
-        except BaseException:
+        except Exception:
             return None
 
     def _get_serializer_info(self, viewset_class):
@@ -2174,7 +2174,7 @@ class APIEndpointMappingAdmin(admin.ModelAdmin):
                     if names_match:
                         serializers['names'] = names_match.group(1)
 
-            except BaseException:
+            except Exception:
                 pass
 
         # Check custom action methods for serializer_class

@@ -4,6 +4,8 @@ Example Django settings for admin SSO configuration.
 Copy relevant settings to your project's settings.py file.
 """
 
+DEBUG = False  # Override in your environment; used in conditional blocks below
+
 # ============================================================================
 # BASIC CONFIGURATION
 # Minimal settings required for admin SSO
@@ -39,10 +41,10 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Fallback for local users
 ]
 
-# Azure AD Configuration
-AZURE_AD_TENANT_ID = 'your-tenant-id-here'
-AZURE_AD_CLIENT_ID = 'your-client-id-here'
-AZURE_AD_CLIENT_SECRET = 'your-client-secret-here'  # Required for OAuth2 flow
+# Azure AD Configuration (placeholder values — replace with real values or use env vars below)
+AZURE_AD_TENANT_ID_PLACEHOLDER = 'your-tenant-id-here'
+AZURE_AD_CLIENT_ID_PLACEHOLDER = 'your-client-id-here'
+AZURE_AD_CLIENT_SECRET_PLACEHOLDER = 'your-client-secret-here'  # Required for OAuth2 flow
 
 
 # ============================================================================
@@ -132,9 +134,9 @@ MSAL_ADMIN_SCOPES_EXTENDED = [
 
 # Option 2: Database with settings fallback
 # Set settings as fallback, use database for overrides
-AZURE_AD_TENANT_ID = os.getenv('AZURE_AD_TENANT_ID')  # Fallback
-AZURE_AD_CLIENT_ID = os.getenv('AZURE_AD_CLIENT_ID')  # Fallback
-AZURE_AD_CLIENT_SECRET = os.getenv('AZURE_AD_CLIENT_SECRET')  # Fallback
+AZURE_AD_TENANT_ID_FALLBACK = os.getenv('AZURE_AD_TENANT_ID')  # Fallback
+AZURE_AD_CLIENT_ID_FALLBACK = os.getenv('AZURE_AD_CLIENT_ID')  # Fallback
+AZURE_AD_CLIENT_SECRET_FALLBACK = os.getenv('AZURE_AD_CLIENT_SECRET')  # Fallback
 # Database config takes precedence if active config exists
 
 
@@ -231,7 +233,6 @@ LOGGING = {
 }
 
 # Create logs directory if it doesn't exist
-import os
 os.makedirs('logs', exist_ok=True)
 
 

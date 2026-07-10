@@ -5,7 +5,7 @@ Tests the view decorators for MSAL token validation.
 """
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch, MagicMock
 from django.http import JsonResponse
 from django.test import RequestFactory
 from hub_auth_client.django.decorators import (
@@ -52,7 +52,7 @@ class TestGetValidator:
             return getattr(mock_settings_module, name, default)
         
         with patch('hub_auth_client.django.decorators.getattr', side_effect=getattr_side_effect):
-            result = get_validator()
+            _result = get_validator()
         
         mock_validator.assert_called_once_with(
             tenant_id='test-tenant',

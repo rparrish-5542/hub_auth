@@ -9,7 +9,7 @@ Tests the database-driven configuration system including:
 """
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 
 
 def get_models():
@@ -100,7 +100,7 @@ class TestAzureADConfiguration:
         _, _, ValidationError = get_test_utils()
         
         # Create first active config
-        config1 = AzureADConfiguration.objects.create(
+        _config1 = AzureADConfiguration.objects.create(
             name="Config 1",
             tenant_id=self.valid_tenant_id,
             client_id=self.valid_client_id,
@@ -125,13 +125,13 @@ class TestAzureADConfiguration:
         assert AzureADConfiguration.get_active_config() is None
         
         # Create active config
-        config = AzureADConfiguration.objects.create(
+        _config = AzureADConfiguration.objects.create(
             name="Active Config",
             tenant_id=self.valid_tenant_id,
             client_id=self.valid_client_id,
             is_active=True
         )
-        
+
         # Should return the active config
         active = AzureADConfiguration.get_active_config()
         assert active is not None
@@ -150,7 +150,7 @@ class TestAzureADConfiguration:
             is_active=True
         )
         
-        validator = config.get_validator()
+        _validator = config.get_validator()
         
         # Should have called MSALTokenValidator with config
         mock_validator.assert_called_once()
@@ -176,7 +176,7 @@ class TestAuthenticationWithDatabaseConfig:
         from hub_auth_client.django.authentication import MSALAuthentication
         
         # Create active config
-        config = AzureADConfiguration.objects.create(
+        _config = AzureADConfiguration.objects.create(
             name="Active Config",
             tenant_id=self.valid_tenant_id,
             client_id=self.valid_client_id,
