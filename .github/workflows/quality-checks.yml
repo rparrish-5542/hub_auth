@@ -167,7 +167,7 @@ jobs:
           fetch-depth: 0  # Full history for secret scanning
 
       - name: TruffleHog Secret Scan
-        uses: trufflesecurity/trufflehog@473e622bdd0c05db4eae4e34e00e59b2097ff1bb  # v3.82.13
+        uses: trufflesecurity/trufflehog@27b0417c16317ca9a472a9a8092acce143b49c55  # v3.95.9
         with:
           path: ./
           base: ${{ github.event.before }}
