@@ -292,3 +292,37 @@ class MSALAdminCallbackView(View):
             return (tenant_id, client_id, client_secret)
 
         return None
+
+
+def get_admin_sso_urlpatterns():
+    """
+    Return URL patterns for MSAL admin SSO and configure the admin login template.
+
+    Add these before admin.site.urls in your root urls.py:
+
+        from hub_auth_client.django.admin_views import get_admin_sso_urlpatterns
+
+        urlpatterns = get_admin_sso_urlpatterns() + [
+            path('admin/', admin.site.urls),
+        ]
+
+    Also add to settings.py:
+
+        AUTHENTICATION_BACKENDS = [
+            'hub_auth_client.django.admin_auth.MSALAdminBackend',
+            'django.contrib.auth.backends.ModelBackend',
+        ]
+
+        # Azure AD app role names that map to Django permissions
+        MSAL_STAFF_ROLES = ['Staff', 'Manager', 'Admin']
+        MSAL_SUPERUSER_ROLES = ['Admin', 'GlobalAdmin']
+    """
+    from django.contrib import admin
+    from django.urls import path
+
+    admin.site.login_template = 'hub_auth_client/admin_login.html'
+
+    return [
+        path('admin/login/msal/', MSALAdminLoginView.as_view(), name='msal_admin_login'),
+        path('admin/login/msal/callback/', MSALAdminCallbackView.as_view(), name='msal_admin_callback'),
+    ]

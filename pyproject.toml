@@ -48,6 +48,9 @@ Issues = "https://github.com/rparrish-5542/hub_auth/issues"
 where = ["."]
 include = ["hub_auth_client*"]
 
+[tool.setuptools.package-data]
+"hub_auth_client" = ["django/templates/**/*.html"]
+
 [tool.black]
 line-length = 100
 target-version = ['py38', 'py39', 'py310', 'py311']
