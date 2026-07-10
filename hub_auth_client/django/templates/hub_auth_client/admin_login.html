@@ -1,126 +1,152 @@
-{% extends "admin/base_site.html" %}
-{% load i18n static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% trans "Log in" %} | Administration</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 4px 16px rgba(0,0,0,0.08);
+      padding: 40px 36px 32px;
+      width: 100%;
+      max-width: 360px;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a1a2e;
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .ms-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 11px 16px;
+      background: #0078d4;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .ms-btn:hover { background: #106ebe; }
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 22px 0;
+      color: #bbb;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      border-top: 1px solid #ebebeb;
+    }
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #444;
+      margin-bottom: 5px;
+    }
+    .field input {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      font-size: 14px;
+      color: #111;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .field input:focus {
+      outline: none;
+      border-color: #0078d4;
+      box-shadow: 0 0 0 3px rgba(0,120,212,.12);
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 10px;
+      background: #417690;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+    .btn-submit:hover { background: #205067; }
+    .error-msg {
+      background: #fff5f5;
+      border: 1px solid #fca5a5;
+      border-radius: 4px;
+      color: #b91c1c;
+      padding: 9px 12px;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <p class="card-title">{% trans "Administration" %}</p>
 
-{% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" href="{% static "admin/css/login.css" %}">
-<style>
-  body.login { background: #f0f0f0; }
-  body.login #container { min-height: 100vh; display: flex; flex-direction: column; }
-  body.login #main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 16px; }
-  #login-card {
-    background: #fff;
-    border-radius: 6px;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.13);
-    padding: 40px 40px 32px;
-    width: 100%;
-    max-width: 360px;
-    box-sizing: border-box;
-  }
-  .ms-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    width: 100%;
-    padding: 13px 20px;
-    background: #0078d4;
-    color: #fff !important;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: 600;
-    box-sizing: border-box;
-  }
-  .ms-btn:hover, .ms-btn:focus { background: #106ebe; }
-  .login-divider {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 24px 0 20px;
-    color: #bbb;
-    font-size: 12px;
-  }
-  .login-divider::before, .login-divider::after {
-    content: '';
-    flex: 1;
-    border-top: 1px solid #e8e8e8;
-  }
-  #login-form .form-row { padding: 0; margin-bottom: 14px; }
-  #login-form label { display: block; margin-bottom: 4px; font-size: 13px; font-weight: 500; color: #333; }
-  #login-form input[type=text],
-  #login-form input[type=password] { width: 100%; box-sizing: border-box; padding: 8px 10px; font-size: 13px; }
-  #login-form .submit-row {
-    background: none;
-    border: none;
-    padding: 8px 0 0;
-    overflow: visible;
-    display: block;
-  }
-  #login-form .submit-row input[type=submit] {
-    width: 100%;
-    padding: 10px;
-    font-size: 13px;
-    background: #417690;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-  }
-  #login-form .submit-row input[type=submit]:hover { background: #205067; }
-  .errornote { margin: 0 0 16px; font-size: 13px; }
-</style>
-{% endblock %}
+    <a class="ms-btn" href="{% url 'msal_admin_login' %}{% if next %}?next={{ next }}{% endif %}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 23 23" style="flex-shrink:0">
+        <path fill="#f3f3f3" d="M0 0h23v23H0z"/>
+        <path fill="#f35325" d="M1 1h10v10H1z"/>
+        <path fill="#81bc06" d="M12 1h10v10H12z"/>
+        <path fill="#05a6f0" d="M1 12h10v10H1z"/>
+        <path fill="#ffba08" d="M12 12h10v10H12z"/>
+      </svg>
+      {% trans "Sign in with Microsoft" %}
+    </a>
 
-{% block bodyclass %}{{ block.super }} login{% endblock %}
-{% block usertools %}{% endblock %}
-{% block nav-global %}{% endblock %}
-{% block content_title %}{% endblock %}
-{% block sidebar %}{% endblock %}
+    <div class="divider">{% trans "or" %}</div>
 
-{% block content %}
-<div id="login-card">
-
-  <a class="ms-btn" href="{% url 'msal_admin_login' %}{% if next %}?next={{ next }}{% endif %}">
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 23 23" style="flex-shrink:0">
-      <path fill="#f3f3f3" d="M0 0h23v23H0z"/>
-      <path fill="#f35325" d="M1 1h10v10H1z"/>
-      <path fill="#81bc06" d="M12 1h10v10H12z"/>
-      <path fill="#05a6f0" d="M1 12h10v10H1z"/>
-      <path fill="#ffba08" d="M12 12h10v10H12z"/>
-    </svg>
-    {% trans "Sign in with Microsoft" %}
-  </a>
-
-  <div class="login-divider">{% trans "or" %}</div>
-
-  {% if form.errors %}
-  <p class="errornote">
-    {% if form.non_field_errors %}
-      {% for error in form.non_field_errors %}{{ error }}{% endfor %}
-    {% else %}
-      {% blocktranslate count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+    {% if form.errors %}
+    <div class="error-msg">
+      {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+      {% else %}
+        {% blocktranslate count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+      {% endif %}
+    </div>
     {% endif %}
-  </p>
-  {% endif %}
 
-  <form action="{{ action }}" method="post" id="login-form">
-    {% csrf_token %}
-    <div class="form-row">
-      {{ form.username.errors }}
-      <label for="{{ form.username.id_for_label }}">{% trans "Username" %}</label>
-      {{ form.username }}
-    </div>
-    <div class="form-row">
-      {{ form.password.errors }}
-      <label for="{{ form.password.id_for_label }}">{% trans "Password" %}</label>
-      {{ form.password }}
-    </div>
-    <input type="hidden" name="next" value="{{ next }}">
-    <div class="submit-row">
-      <input type="submit" value="{% trans 'Log in' %}">
-    </div>
-  </form>
-
-</div>
-{% endblock %}
+    <form method="post" action="{{ action }}">
+      {% csrf_token %}
+      <div class="field">
+        <label for="{{ form.username.id_for_label }}">{% trans "Username" %}</label>
+        {{ form.username }}
+      </div>
+      <div class="field">
+        <label for="{{ form.password.id_for_label }}">{% trans "Password" %}</label>
+        {{ form.password }}
+      </div>
+      <input type="hidden" name="next" value="{{ next }}">
+      <button type="submit" class="btn-submit">{% trans "Log in" %}</button>
+    </form>
+  </div>
+</body>
+</html>
