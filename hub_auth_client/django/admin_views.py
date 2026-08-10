@@ -62,6 +62,13 @@ class MSALAdminLoginView(View):
             'state': state,
         }
 
+        # Let the login page force the Microsoft account chooser (e.g. a
+        # "use a different account" link) instead of silently reusing
+        # whatever AAD session the browser already has.
+        prompt = request.GET.get('prompt')
+        if prompt in {'select_account', 'login', 'consent', 'none'}:
+            params['prompt'] = prompt
+
         auth_url = f"{auth_endpoint}?{urlencode(params)}"
 
         return redirect(auth_url)
@@ -299,6 +306,43 @@ class MSALAdminCallbackView(View):
         return None
 
 
+class MSALAdminLogoutRedirectView(View):
+    """
+    Ends the Microsoft SSO session after the Django admin logs a user out.
+
+    Without this, Django's built-in logout only clears the local session —
+    the browser still has an active Azure AD SSO session, so the next click
+    on "Sign in with Microsoft" silently re-authenticates the same account
+    with no account picker. get_admin_sso_urlpatterns() wires this in as
+    LOGOUT_REDIRECT_URL, so it runs automatically right after admin logout.
+    """
+
+    def get(self, request):
+        tenant_id = self._get_tenant_id()
+        login_url = request.build_absolute_uri('/admin/login/')
+
+        if not tenant_id:
+            return redirect(login_url)
+
+        params = {'post_logout_redirect_uri': login_url}
+        ms_logout_url = (
+            f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/logout?{urlencode(params)}"
+        )
+        return redirect(ms_logout_url)
+
+    def _get_tenant_id(self):
+        try:
+            from .config_models import AzureADConfiguration
+            config = AzureADConfiguration.get_active_config()
+
+            if config:
+                return config.tenant_id
+        except Exception:
+            logger.debug("Azure AD config not available from database, falling back to settings")
+
+        return getattr(settings, 'AZURE_AD_TENANT_ID', None)
+
+
 def get_admin_sso_urlpatterns():
     """
     Return URL patterns for MSAL admin SSO and configure the admin login template.
@@ -321,13 +365,22 @@ def get_admin_sso_urlpatterns():
         # Azure AD app role names that map to Django permissions
         MSAL_STAFF_ROLES = ['Staff', 'Manager', 'Admin']
         MSAL_SUPERUSER_ROLES = ['Admin', 'GlobalAdmin']
+
+    Note: the Azure AD App Registration must have this app's login page
+    (e.g. https://your-host/admin/login/) registered as a valid redirect
+    URI / front-channel logout URL, or Microsoft's logout endpoint will
+    refuse the post_logout_redirect_uri used by MSALAdminLogoutRedirectView.
     """
     from django.contrib import admin
     from django.urls import path
 
     admin.site.login_template = 'hub_auth_client/admin_login.html'
 
+    if not getattr(settings, 'LOGOUT_REDIRECT_URL', None):
+        settings.LOGOUT_REDIRECT_URL = '/admin/login/msal/logout/'
+
     return [
         path('admin/login/msal/', MSALAdminLoginView.as_view(), name='msal_admin_login'),
         path('admin/login/msal/callback/', MSALAdminCallbackView.as_view(), name='msal_admin_callback'),
+        path('admin/login/msal/logout/', MSALAdminLogoutRedirectView.as_view(), name='msal_admin_logout_redirect'),
     ]
