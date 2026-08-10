@@ -22,9 +22,9 @@ from typing import Callable, List
 from django.conf import settings
 from django.http import JsonResponse
 
-logger = logging.getLogger(__name__)
-
 from ..validator import MSALTokenValidator
+
+logger = logging.getLogger(__name__)
 
 
 def get_validator():
