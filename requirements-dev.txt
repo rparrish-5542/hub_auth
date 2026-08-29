@@ -4,7 +4,7 @@
 pytest>=8.0.0
 pytest-cov>=4.1.0
 pytest-django>=4.5.0
-pytest-asyncio>=0.23.0
+pytest-asyncio>=1.2.0
 
 # Code formatting
 black>=24.0.0
@@ -16,7 +16,7 @@ pylint>=3.0.0
 mypy>=1.8.0
 
 # Security scanning
-bandit[toml]>=1.7.5
+bandit[toml]>=1.8.6
 safety>=3.0.0
 pip-audit>=2.6.0
 
