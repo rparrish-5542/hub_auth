@@ -15,7 +15,7 @@ cryptography>=41.0.7
 requests>=2.31.0
 
 # Environment Variables
-python-dotenv>=1.0.0
+python-dotenv>=1.2.1
 
 # Production Server
 gunicorn>=21.2.0
