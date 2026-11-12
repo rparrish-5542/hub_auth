@@ -236,6 +236,46 @@ MIDDLEWARE = [
 
 The middleware attaches `request.msal_token` and `request.msal_user` to all requests.
 
+## Service-to-Service App Tokens (HS256)
+
+The preferred model for one internal service calling another:
+
+1. Each service owns its own `APP_JWT_SECRET` (32+ bytes) and never shares it.
+2. A service **mints** tokens for its callers: `aud` = itself, `sub` = the caller.
+3. The caller stores the token it was given (e.g. `TEAMS_CONNECTOR_TOKEN` in its `.env`)
+   and sends it as `Authorization: Bearer <token>`.
+4. The service **checks** incoming tokens with its own secret:
+   `AppTokenValidator(secret=APP_JWT_SECRET, audience="<own aud>")`, then maps `sub`
+   to the caller.
+
+### Minting
+
+```python
+from hub_auth_client import mint_app_token
+
+token = mint_app_token(APP_JWT_SECRET, sub="checkin_service", aud="teams_connector",
+                       expires_in_seconds=365 * 86400)
+```
+
+Claims are `sub`, `aud`, `iss` (defaults to `aud`), `iat`, `exp` and a random `jti`.
+Tokens always expire; the secret must be at least 32 bytes.
+
+**Django services** (uses `APP_JWT_SECRET`, `APP_JWT_AUDIENCE` and `APP_JWT_ISSUER` from settings,
+so the token matches what that service checks):
+
+```bash
+python manage.py mint_app_token checkin_service --days 365
+python manage.py mint_app_token checkin_service --aud teams_connector
+```
+
+**Other services** (e.g. FastAPI), secret read from the environment:
+
+```bash
+python -m hub_auth_client.mint checkin_service --aud teams_connector --days 365
+```
+
+Both print only the token.
+
 ## Configuration
 
 ### Environment Variables

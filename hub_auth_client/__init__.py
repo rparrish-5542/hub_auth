@@ -14,11 +14,13 @@ from .exceptions import (
     TokenExpiredError,
     TokenValidationError,
 )
+from .minting import mint_app_token
 from .validator import AppTokenValidator, MSALTokenValidator
 
 __all__ = [
     "MSALTokenValidator",
     "AppTokenValidator",
+    "mint_app_token",
     "TokenValidationError",
     "TokenExpiredError",
     "InvalidTokenError",
